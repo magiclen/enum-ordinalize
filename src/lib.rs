@@ -36,9 +36,7 @@
 //!
 //! create_ordinalized_enum!(MyEnum,
 //!     u8,
-//!     Zero,.travis.yml
-//appveyor.yml
-//LICENSE
+//!     Zero,
 //!     One,
 //!     Two
 //! );
