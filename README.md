@@ -2,6 +2,7 @@ Enum Ordinalize
 ====================
 
 [![Build Status](https://travis-ci.org/magiclen/enum-ordinalize.svg?branch=master)](https://travis-ci.org/magiclen/enum-ordinalize)
+[![Build status](https://ci.appveyor.com/api/projects/status/s4378vfk760xtqlf/branch/master?svg=true)](https://ci.appveyor.com/project/magiclen/enum-ordinalize/branch/master)
 
 ## Make an Enum Ordinalized
 
