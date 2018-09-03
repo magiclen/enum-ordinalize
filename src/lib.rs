@@ -39,8 +39,8 @@
 //!
 //! ## About an Ordinalized Enum
 //!
-//! An ordinalized enum is always sized **isize** in order to directly **transmute** into a **isize** value, or conversely.
-//! There is a variant named *__DotNotUse* whose ordinal is always the maximum of a **isize** value for every ordinalized enum.
+//! An ordinalized enum is always sized **isize** in order to directly **transmute** into an **isize** value, or conversely.
+//! There is a variant named *__DotNotUse* whose ordinal is always the maximum of an **isize** value for every ordinalized enum.
 //!
 //! If you are 100% sure that the **isize** value can transmute into a variant of your ordinalized enum. You can use `from_ordinal_unsafe` associated function and **unsafe** keyword to speed up.
 //!
