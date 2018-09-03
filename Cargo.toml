@@ -1,6 +1,6 @@
 [package]
 name = "enum-ordinalize"
-version = "2.0.2"
+version = "2.0.3"
 authors = ["Magic Len <len@magiclen.org>"]
 repository = "https://github.com/magiclen/enum-ordinalize"
 homepage = "https://magiclen.org/enum-ordinalize"
