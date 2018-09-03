@@ -75,6 +75,7 @@ macro_rules! ordinalize_enum_from_ordinal {
     }
 }
 
+#[cfg(not(all(windows, target_pointer_width = "32")))]
 #[macro_export]
 #[doc(hidden)]
 macro_rules! ordinalize_enum_ordinal {
@@ -83,6 +84,21 @@ macro_rules! ordinalize_enum_ordinal {
             unsafe {
                 ::std::mem::transmute(::std::mem::discriminant(self))
             }
+        }
+    }
+}
+
+#[cfg(all(windows, target_pointer_width = "32"))]
+#[macro_export]
+#[doc(hidden)]
+macro_rules! ordinalize_enum_ordinal {
+    ( $name:ident $( , $variants:ident )+ $(,)* ) => {
+        fn ordinal(&self) -> isize {
+            let n: i64 = unsafe {
+                ::std::mem::transmute(::std::mem::discriminant(self))
+            };
+
+            n as isize
         }
     }
 }
