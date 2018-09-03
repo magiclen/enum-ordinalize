@@ -1,41 +1,15 @@
 //! # Enum Ordinalize
-//! This crates provides `ordinalize_enum` and `create_ordinalized_enum` macros to let enums can not only get its variants' ordinal but also be constructed with an ordinal.
-//!
-//! ## Make an Enum Ordinalized
-//!
-//! `ordinalize_enum` macro can implement a `ordinal` method and a `from_ordinal` associated function for an existing `enum`.
-//!
-//! ```
-//! #[macro_use] extern crate enum_ordinalize;
-//!
-//! #[derive(Debug, PartialEq)]
-//! enum MyEnum {
-//!     Zero,
-//!     One,
-//!     Two,
-//! }
-//!
-//! ordinalize_enum!(MyEnum,
-//!     u8,
-//!     Zero,
-//!     One,
-//!     Two
-//! );
-//!
-//! assert_eq!(2, MyEnum::Two.ordinal());
-//! assert_eq!(Some(MyEnum::One), MyEnum::from_ordinal(1));
-//! ```
+//! This crates provides `create_ordinalized_enum` macro to let enums can not only get its variants' ordinal but also be constructed from an ordinal.
 //!
 //! ## Create an Ordinalized Enum
 //!
-//! `create_ordinalized_enum` macro can create an enum and implement a `ordinal` method and a `from_ordinal` associated function for it.
+//! `create_ordinalized_enum` macro can create an enum and implement a `ordinal` method, as well as `from_ordinal` and `from_ordinal_unsafe` associated functions for it.
 //! The new enum also implements `Debug`, `PartialEq`, and `Clone` traits.
 //!
 //! ```
 //! #[macro_use] extern crate enum_ordinalize;
 //!
 //! create_ordinalized_enum!(MyEnum,
-//!     u8,
 //!     Zero,
 //!     One,
 //!     Two
@@ -45,7 +19,6 @@
 //! assert_eq!(Some(MyEnum::One), MyEnum::from_ordinal(1));
 //!
 //! create_ordinalized_enum!(pub MyPublicEnum,
-//!     u8,
 //!     A,
 //!     B,
 //!     C
@@ -55,7 +28,6 @@
 //! assert_eq!(Some(MyPublicEnum::B), MyPublicEnum::from_ordinal(1));
 //!
 //! create_ordinalized_enum!(MySpecialEnum,
-//!     u8,
 //!     Two = 2,
 //!     Four = 4,
 //!     Eight = 8
@@ -64,90 +36,141 @@
 //! assert_eq!(2, MySpecialEnum::Two.ordinal());
 //! assert_eq!(Some(MySpecialEnum::Four), MySpecialEnum::from_ordinal(4));
 //! ```
+//!
+//! ## About an Ordinalized Enum
+//!
+//! An ordinalized enum is always sized **isize** in order to directly **transmute** into a **isize** value, or conversely.
+//! There is a variant named *__DotNotUse* whose ordinal is always the maximum of a **isize** value for every ordinalized enum.
+//!
+//! If you are 100% sure that the **isize** value can transmute into a variant of your ordinalized enum. You can use `from_ordinal_unsafe` associated function and **unsafe** keyword to speed up.
+//!
+//! ```
+//! #[macro_use] extern crate enum_ordinalize;
+//!
+//! create_ordinalized_enum!(MyEnum,
+//!     Zero,
+//!     One,
+//!     Two
+//! );
+//!
+//! assert_eq!(MyEnum::One, unsafe{MyEnum::from_ordinal_unsafe(1)});
+//! ```
 
-/// Implement a `ordinal` method and a `from_ordinal` associated function for an existing `enum`.
 #[macro_export]
-macro_rules! ordinalize_enum {
-    ( $name:ident, $t:ty $( , $variants:ident )+ $(,)* ) => {
-        impl $name {
-            fn ordinal(&self) -> $t {
-                match self {
-                    $(
-                        $name::$variants => $name::$variants as $t,
-                    )+
-                }
+#[doc(hidden)]
+macro_rules! ordinalize_enum_from_ordinal {
+    ( $name:ident $( , $variants:ident )+ $(,)* ) => {
+        fn from_ordinal(number: isize) -> Option<$name> {
+            match number{
+                $(
+                    n if n == ($name::$variants as isize) => Some($name::$variants),
+                )+
+                _ => None
             }
+        }
 
-            fn from_ordinal(number: $t) -> Option<$name> {
-                match number{
-                    $(
-                        n if n == ($name::$variants as $t) => Some($name::$variants),
-                    )+
-                    _ => None
-                }
+        unsafe fn from_ordinal_unsafe(number: isize) -> $name {
+            ::std::mem::transmute(number)
+        }
+    }
+}
+
+#[macro_export]
+#[doc(hidden)]
+macro_rules! ordinalize_enum_ordinal {
+    ( $name:ident $( , $variants:ident )+ $(,)* ) => {
+        fn ordinal(&self) -> isize {
+            unsafe {
+                ::std::mem::transmute(::std::mem::discriminant(self))
             }
         }
     }
 }
 
-/// Create an enum and implement a `ordinal` method and a `from_ordinal` associated function for it. The new enum also implements `Debug`, `PartialEq`, and `Clone` traits.
+#[macro_export]
+#[doc(hidden)]
+macro_rules! ordinalize_enum_impl {
+    ( $name:ident $( , $variants:ident )+ $(,)* ) => {
+        impl $name {
+            ordinalize_enum_ordinal!(
+                $name,
+                $(
+                    $variants,
+                )+
+            );
+
+            ordinalize_enum_from_ordinal!(
+                $name,
+                $(
+                    $variants,
+                )+
+            );
+        }
+    }
+}
+
+/// Create an enum and implement a `ordinal` method, as well as `from_ordinal` and `from_ordinal_unsafe` associated functions for it. The new enum also implements `Debug`, `PartialEq`, and `Clone` traits.
 #[macro_export]
 macro_rules! create_ordinalized_enum {
-    ( $name:ident, $t:ty $( ,$variants:ident )+ $(,)* ) => {
+    ( $name:ident $( ,$variants:ident )+ $(,)* ) => {
         #[derive(Debug, PartialEq, Clone)]
         enum $name {
             $(
                 $variants,
             )+
+
+            __DotNotUse = isize::max_value()
         }
-        ordinalize_enum!(
+        ordinalize_enum_impl!(
             $name,
-            $t,
             $(
                 $variants,
             )+
         );
     };
-    ( $name:ident, $t:ty $( ,$variants:ident = $values:expr )+ $(,)* ) => {
+    ( $name:ident $( ,$variants:ident = $values:expr )+ $(,)* ) => {
         #[derive(Debug, PartialEq, Clone)]
         enum $name {
             $(
                 $variants = $values,
             )+
+
+            __DotNotUse = isize::max_value()
         }
-        ordinalize_enum!(
+        ordinalize_enum_impl!(
             $name,
-            $t,
             $(
                 $variants,
             )+
         );
     };
-    ( pub $name:ident, $t:ty $( ,$variants:ident )+ $(,)* ) => {
+    ( pub $name:ident $( ,$variants:ident )+ $(,)* ) => {
         #[derive(Debug, PartialEq, Clone)]
         pub enum $name {
             $(
                 $variants,
             )+
+
+            __DotNotUse = isize::max_value()
         }
-        ordinalize_enum!(
+        ordinalize_enum_impl!(
             $name,
-            $t,
             $(
                 $variants,
             )+
         );
     };
-    ( pub $name:ident, $t:ty $( ,$variants:ident = $values:expr )+ $(,)* ) => {
+    ( pub $name:ident $( ,$variants:ident = $values:expr )+ $(,)* ) => {
         #[derive(Debug, PartialEq, Clone)]
         pub enum $name {
             $(
                 $variants = $values,
             )+
+
+            __DotNotUse = isize::max_value()
         }
-        ordinalize_enum!(
+        ordinalize_enum_impl!(
             $name,
-            $t,
             $(
                 $variants,
             )+

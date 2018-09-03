@@ -1,12 +1,12 @@
 [package]
 name = "enum-ordinalize"
-version = "1.0.1"
+version = "2.0.0"
 authors = ["Magic Len <len@magiclen.org>"]
 repository = "https://github.com/magiclen/enum-ordinalize"
 homepage = "https://magiclen.org/enum-ordinalize"
 keywords = ["enum", "ordinal", "ordinalize", "number"]
 categories = ["value-formatting"]
-description= "This crates provides `ordinalize_enum` and `create_ordinalized_enum` macros to let enums can not only get its variants' ordinal but also be constructed with an ordinal."
+description= "This crates provides `create_ordinalized_enum` macro to let enums can not only get its variants' ordinal but also be constructed from an ordinal."
 readme = "README.md"
 license = "MIT"
 
