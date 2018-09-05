@@ -9,7 +9,7 @@ This crates provides `create_ordinalized_enum` macro to let enums can not only g
 ## Create an Ordinalized Enum
 
 `create_ordinalized_enum` macro can create an enum and implement a `ordinal` method, as well as `from_ordinal` and `from_ordinal_unsafe` associated functions for it.
-The new enum also implements `Debug`, `PartialEq`, and `Clone` traits.
+The new enum also implements `Debug`, `PartialEq`, `Clone`, `Eq` and `Hash` traits.
 
 ```rust
 #[macro_use] extern crate enum_ordinalize;
