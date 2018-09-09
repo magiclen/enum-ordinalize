@@ -60,7 +60,7 @@
 #[doc(hidden)]
 macro_rules! ordinalize_enum_from_ordinal {
     ( $name:ident $( , $variants:ident )+ $(,)* ) => {
-        fn from_ordinal(number: isize) -> Option<$name> {
+        pub fn from_ordinal(number: isize) -> Option<$name> {
             match number{
                 $(
                     n if n == ($name::$variants as isize) => Some($name::$variants),
@@ -69,7 +69,7 @@ macro_rules! ordinalize_enum_from_ordinal {
             }
         }
 
-        unsafe fn from_ordinal_unsafe(number: isize) -> $name {
+        pub unsafe fn from_ordinal_unsafe(number: isize) -> $name {
             ::std::mem::transmute(number)
         }
     }
@@ -80,7 +80,7 @@ macro_rules! ordinalize_enum_from_ordinal {
 #[doc(hidden)]
 macro_rules! ordinalize_enum_ordinal {
     ( $name:ident $( , $variants:ident )+ $(,)* ) => {
-        fn ordinal(&self) -> isize {
+        pub fn ordinal(&self) -> isize {
             unsafe {
                 ::std::mem::transmute(::std::mem::discriminant(self))
             }
@@ -93,7 +93,7 @@ macro_rules! ordinalize_enum_ordinal {
 #[doc(hidden)]
 macro_rules! ordinalize_enum_ordinal {
     ( $name:ident $( , $variants:ident )+ $(,)* ) => {
-        fn ordinal(&self) -> isize {
+        pub fn ordinal(&self) -> isize {
             let n: i64 = unsafe {
                 ::std::mem::transmute(::std::mem::discriminant(self))
             };
