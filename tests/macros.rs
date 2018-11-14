@@ -2,7 +2,7 @@
 extern crate enum_ordinalize;
 
 #[test]
-fn test_create_ordinalized_enum_1_1() {
+fn create_ordinalized_enum_1_1() {
     create_ordinalized_enum!(MyEnum,
         Zero,
         One,
@@ -23,7 +23,7 @@ fn test_create_ordinalized_enum_1_1() {
 }
 
 #[test]
-fn test_create_ordinalized_enum_1_2() {
+fn create_ordinalized_enum_1_2() {
     create_ordinalized_enum!(pub MyEnum,
         Zero,
         One,
@@ -44,7 +44,7 @@ fn test_create_ordinalized_enum_1_2() {
 }
 
 #[test]
-fn test_create_ordinalized_enum_2_1() {
+fn create_ordinalized_enum_2_1() {
     create_ordinalized_enum!(MyEnum,
         Two = 2,
         Four = 4,
@@ -65,7 +65,7 @@ fn test_create_ordinalized_enum_2_1() {
 }
 
 #[test]
-fn test_create_ordinalized_enum_2_2() {
+fn create_ordinalized_enum_2_2() {
     create_ordinalized_enum!(pub MyEnum,
         Two = 2,
         Four = 4,
