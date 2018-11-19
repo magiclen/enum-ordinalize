@@ -4,13 +4,12 @@ Enum Ordinalize
 [![Build Status](https://travis-ci.org/magiclen/enum-ordinalize.svg?branch=master)](https://travis-ci.org/magiclen/enum-ordinalize)
 [![Build status](https://ci.appveyor.com/api/projects/status/s4378vfk760xtqlf/branch/master?svg=true)](https://ci.appveyor.com/project/magiclen/enum-ordinalize/branch/master)
 
-# Enum Ordinalize
 This crates provides `create_ordinalized_enum` macro to let enums can not only get its variants' ordinal but also be constructed from an ordinal.
 
 ## Create an Ordinalized Enum
 
 `create_ordinalized_enum` macro can create an enum and implement a `ordinal` method, as well as `from_ordinal` and `from_ordinal_unsafe` associated functions for it.
-The new enum also implements `Debug`, `PartialOrd`, `Ord`, `PartialEq`, `Clone`, `Eq` and `Hash` traits.
+The new enum also implements `Debug`, `PartialOrd`, `Ord`, `PartialEq`, `Clone`, `Eq`, `Hash` and `Copy` traits.
 
 ```rust
 #[macro_use] extern crate enum_ordinalize;

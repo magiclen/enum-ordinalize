@@ -1,11 +1,12 @@
 /*!
 # Enum Ordinalize
+
 This crates provides `create_ordinalized_enum` macro to let enums can not only get its variants' ordinal but also be constructed from an ordinal.
 
 ## Create an Ordinalized Enum
 
 `create_ordinalized_enum` macro can create an enum and implement a `ordinal` method, as well as `from_ordinal` and `from_ordinal_unsafe` associated functions for it.
-The new enum also implements `Debug`, `PartialOrd`, `Ord`, `PartialEq`, `Clone`, `Eq` and `Hash` traits.
+The new enum also implements `Debug`, `PartialOrd`, `Ord`, `PartialEq`, `Clone`, `Eq`, `Hash` and `Copy` traits.
 
 ```rust
 #[macro_use] extern crate enum_ordinalize;

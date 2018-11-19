@@ -67,11 +67,11 @@ macro_rules! ordinalize_enum_impl {
     }
 }
 
-/// Create an enum and implement a `ordinal` method, as well as `from_ordinal` and `from_ordinal_unsafe` associated functions for it. The new enum also implements `Debug`, `PartialOrd`, `Ord`, `PartialEq`, `Clone`, `Eq` and `Hash` traits.
+/// Create an enum and implement a `ordinal` method, as well as `from_ordinal` and `from_ordinal_unsafe` associated functions for it. The new enum also implements `Debug`, `PartialOrd`, `Ord`, `PartialEq`, `Clone`, `Eq`, `Hash` and `Copy` traits.
 #[macro_export]
 macro_rules! create_ordinalized_enum {
     ( $name:ident $( ,$variants:ident )+ $(,)* ) => {
-        #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash)]
+        #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
         enum $name {
             $(
                 $variants,
@@ -87,7 +87,7 @@ macro_rules! create_ordinalized_enum {
         );
     };
     ( $name:ident $( ,$variants:ident = $values:expr )+ $(,)* ) => {
-        #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash)]
+        #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
         enum $name {
             $(
                 $variants = $values,
@@ -103,7 +103,7 @@ macro_rules! create_ordinalized_enum {
         );
     };
     ( pub $name:ident $( ,$variants:ident )+ $(,)* ) => {
-        #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash)]
+        #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
         pub enum $name {
             $(
                 $variants,
@@ -119,7 +119,7 @@ macro_rules! create_ordinalized_enum {
         );
     };
     ( pub $name:ident $( ,$variants:ident = $values:expr )+ $(,)* ) => {
-        #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash)]
+        #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
         pub enum $name {
             $(
                 $variants = $values,
