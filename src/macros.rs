@@ -77,7 +77,7 @@ macro_rules! create_ordinalized_enum {
                 $variants,
             )+
 
-            __DotNotUse = isize::max_value()
+            __DoNotUse = isize::max_value()
         }
         ordinalize_enum_impl!(
             $name,
@@ -93,7 +93,7 @@ macro_rules! create_ordinalized_enum {
                 $variants = $values,
             )+
 
-            __DotNotUse = isize::max_value()
+            __DoNotUse = isize::max_value()
         }
         ordinalize_enum_impl!(
             $name,
@@ -109,7 +109,7 @@ macro_rules! create_ordinalized_enum {
                 $variants,
             )+
 
-            __DotNotUse = isize::max_value()
+            __DoNotUse = isize::max_value()
         }
         ordinalize_enum_impl!(
             $name,
@@ -125,7 +125,7 @@ macro_rules! create_ordinalized_enum {
                 $variants = $values,
             )+
 
-            __DotNotUse = isize::max_value()
+            __DoNotUse = isize::max_value()
         }
         ordinalize_enum_impl!(
             $name,
