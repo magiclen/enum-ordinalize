@@ -102,9 +102,9 @@ macro_rules! create_ordinalized_enum {
             )+
         );
     };
-    ( pub $name:ident $( ,$variants:ident )+ $(,)* ) => {
+    ( $v:vis $name:ident $( ,$variants:ident )+ $(,)* ) => {
         #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
-        pub enum $name {
+        $v enum $name {
             $(
                 $variants,
             )+
@@ -118,9 +118,9 @@ macro_rules! create_ordinalized_enum {
             )+
         );
     };
-    ( pub $name:ident $( ,$variants:ident = $values:expr )+ $(,)* ) => {
+    ( $v:vis $name:ident $( ,$variants:ident = $values:expr )+ $(,)* ) => {
         #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
-        pub enum $name {
+        $v enum $name {
             $(
                 $variants = $values,
             )+
