@@ -45,7 +45,6 @@ assert_eq!(Some(MySpecialEnum::Four), MySpecialEnum::from_ordinal(4));
 ## About an Ordinalized Enum
 
 An ordinalized enum is always sized **isize** in order to directly **transmute** into an **isize** value, or conversely.
-There is a variant named *__DoNotUse* whose ordinal is always the maximum of an **isize** value for every ordinalized enum.
 
 If you are 100% sure that the **isize** value can transmute into a variant of your ordinalized enum. You can use the `from_ordinal_unsafe` associated function and the **unsafe** keyword to speed up.
 

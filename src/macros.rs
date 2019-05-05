@@ -71,13 +71,12 @@ macro_rules! ordinalize_enum_impl {
 #[macro_export]
 macro_rules! create_ordinalized_enum {
     ( $name:ident $( ,$variants:ident )+ $(,)* ) => {
+        #[repr(isize)]
         #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
         enum $name {
             $(
                 $variants,
             )+
-
-            __DoNotUse = isize::max_value()
         }
         ordinalize_enum_impl!(
             $name,
@@ -87,13 +86,12 @@ macro_rules! create_ordinalized_enum {
         );
     };
     ( $name:ident $( ,$variants:ident = $values:expr )+ $(,)* ) => {
+        #[repr(isize)]
         #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
         enum $name {
             $(
                 $variants = $values,
             )+
-
-            __DoNotUse = isize::max_value()
         }
         ordinalize_enum_impl!(
             $name,
@@ -103,13 +101,12 @@ macro_rules! create_ordinalized_enum {
         );
     };
     ( $v:vis $name:ident $( ,$variants:ident )+ $(,)* ) => {
+        #[repr(isize)]
         #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
         $v enum $name {
             $(
                 $variants,
             )+
-
-            __DoNotUse = isize::max_value()
         }
         ordinalize_enum_impl!(
             $name,
@@ -119,13 +116,12 @@ macro_rules! create_ordinalized_enum {
         );
     };
     ( $v:vis $name:ident $( ,$variants:ident = $values:expr )+ $(,)* ) => {
+        #[repr(isize)]
         #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
         $v enum $name {
             $(
                 $variants = $values,
             )+
-
-            __DoNotUse = isize::max_value()
         }
         ordinalize_enum_impl!(
             $name,
