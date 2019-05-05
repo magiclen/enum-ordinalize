@@ -44,7 +44,20 @@ assert_eq!(Some(MySpecialEnum::Four), MySpecialEnum::from_ordinal(4));
 
 ## About an Ordinalized Enum
 
-An ordinalized enum is always sized **isize** in order to directly **transmute** into an **isize** value, or conversely.
+An ordinalized enum is sized **isize** by default. If you want to change it, just assign an integer type explicitly.
+
+```rust
+#[macro_use] extern crate enum_ordinalize;
+
+create_ordinalized_enum!(MyEnum: u8,
+    Zero,
+    One,
+    Two
+);
+
+assert_eq!(2u8, MyEnum::Two.ordinal());
+assert_eq!(Some(MyEnum::One), MyEnum::from_ordinal(1u8));
+```
 
 If you are 100% sure that the **isize** value can transmute into a variant of your ordinalized enum. You can use the `from_ordinal_unsafe` associated function and the **unsafe** keyword to speed up.
 

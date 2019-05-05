@@ -1,6 +1,6 @@
 [package]
 name = "enum-ordinalize"
-version = "2.4.0"
+version = "2.5.0"
 authors = ["Magic Len <len@magiclen.org>"]
 repository = "https://github.com/magiclen/enum-ordinalize"
 homepage = "https://magiclen.org/enum-ordinalize"
@@ -15,3 +15,6 @@ travis-ci = { repository = "magiclen/enum-ordinalize", branch = "master" }
 appveyor = { repository = "magiclen/enum-ordinalize", branch = "master", service = "github" }
 
 [dependencies]
+
+[features]
+nightly-test = []

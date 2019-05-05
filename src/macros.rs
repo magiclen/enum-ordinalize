@@ -1,46 +1,48 @@
 #[macro_export]
 #[doc(hidden)]
 macro_rules! ordinalize_enum_from_ordinal {
-    ( $name:ident $( , $variants:ident )+ $(,)* ) => {
-        pub fn from_ordinal(number: isize) -> Option<$name> {
+    ( $name:ident: $t:ident $( , $variants:ident )+ $(,)* ) => {
+        pub fn from_ordinal(number: $t) -> Option<$name> {
             match number{
                 $(
-                    n if n == ($name::$variants as isize) => Some($name::$variants),
+                    n if n == ($name::$variants as $t) => Some($name::$variants),
                 )+
                 _ => None
             }
         }
 
-        pub unsafe fn from_ordinal_unsafe(number: isize) -> $name {
+        pub unsafe fn from_ordinal_unsafe(number: $t) -> $name {
             ::std::mem::transmute(number)
         }
     }
 }
 
-#[cfg(not(all(windows, target_pointer_width = "32")))]
+#[cfg(feature = "repr128")]
 #[macro_export]
 #[doc(hidden)]
 macro_rules! ordinalize_enum_ordinal {
-    ( $name:ident $( , $variants:ident )+ $(,)* ) => {
-        pub fn ordinal(&self) -> isize {
-            unsafe {
+    ( $name:ident: $t:ident) => {
+        pub fn ordinal(&self) -> $t {
+            let n: u128 = unsafe {
                 ::std::mem::transmute(::std::mem::discriminant(self))
-            }
+            };
+
+            n as $t
         }
     }
 }
 
-#[cfg(all(windows, target_pointer_width = "32"))]
+#[cfg(not(feature = "repr128"))]
 #[macro_export]
 #[doc(hidden)]
 macro_rules! ordinalize_enum_ordinal {
-    ( $name:ident $( , $variants:ident )+ $(,)* ) => {
-        pub fn ordinal(&self) -> isize {
-            let n: i64 = unsafe {
+    ( $name:ident: $t:ident) => {
+        pub fn ordinal(&self) -> $t {
+            let n: u64 = unsafe {
                 ::std::mem::transmute(::std::mem::discriminant(self))
             };
 
-            n as isize
+            n as $t
         }
     }
 }
@@ -48,17 +50,12 @@ macro_rules! ordinalize_enum_ordinal {
 #[macro_export]
 #[doc(hidden)]
 macro_rules! ordinalize_enum_impl {
-    ( $name:ident $( , $variants:ident )+ $(,)* ) => {
+    ( $name:ident: $t:ident $( , $variants:ident )+ $(,)* ) => {
         impl $name {
-            ordinalize_enum_ordinal!(
-                $name,
-                $(
-                    $variants,
-                )+
-            );
+            ordinalize_enum_ordinal!($name: $t);
 
             ordinalize_enum_from_ordinal!(
-                $name,
+                $name: $t,
                 $(
                     $variants,
                 )+
@@ -79,7 +76,7 @@ macro_rules! create_ordinalized_enum {
             )+
         }
         ordinalize_enum_impl!(
-            $name,
+            $name: isize,
             $(
                 $variants,
             )+
@@ -94,7 +91,37 @@ macro_rules! create_ordinalized_enum {
             )+
         }
         ordinalize_enum_impl!(
-            $name,
+            $name: isize,
+            $(
+                $variants,
+            )+
+        );
+    };
+    ( $name:ident: $t:ident $( ,$variants:ident )+ $(,)* ) => {
+        #[repr($t)]
+        #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
+        enum $name {
+            $(
+                $variants,
+            )+
+        }
+        ordinalize_enum_impl!(
+            $name: $t,
+            $(
+                $variants,
+            )+
+        );
+    };
+    ( $name:ident: $t:ident $( ,$variants:ident = $values:expr )+ $(,)* ) => {
+        #[repr($t)]
+        #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
+        enum $name {
+            $(
+                $variants = $values,
+            )+
+        }
+        ordinalize_enum_impl!(
+            $name: $t,
             $(
                 $variants,
             )+
@@ -109,7 +136,7 @@ macro_rules! create_ordinalized_enum {
             )+
         }
         ordinalize_enum_impl!(
-            $name,
+            $name: isize,
             $(
                 $variants,
             )+
@@ -124,7 +151,37 @@ macro_rules! create_ordinalized_enum {
             )+
         }
         ordinalize_enum_impl!(
-            $name,
+            $name: isize,
+            $(
+                $variants,
+            )+
+        );
+    };
+    ( $v:vis $name:ident: $t:ident $( ,$variants:ident )+ $(,)* ) => {
+        #[repr($t)]
+        #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
+        $v enum $name {
+            $(
+                $variants,
+            )+
+        }
+        ordinalize_enum_impl!(
+            $name: $t,
+            $(
+                $variants,
+            )+
+        );
+    };
+    ( $v:vis $name:ident: $t:ident $( ,$variants:ident = $values:expr )+ $(,)* ) => {
+        #[repr($t)]
+        #[derive(Debug, PartialOrd, Ord, PartialEq, Clone, Eq, Hash, Copy)]
+        $v enum $name {
+            $(
+                $variants = $values,
+            )+
+        }
+        ordinalize_enum_impl!(
+            $name: $t,
             $(
                 $variants,
             )+
