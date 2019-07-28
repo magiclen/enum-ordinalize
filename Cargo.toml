@@ -1,6 +1,6 @@
 [package]
 name = "enum-ordinalize"
-version = "2.5.0"
+version = "2.5.1"
 authors = ["Magic Len <len@magiclen.org>"]
 repository = "https://github.com/magiclen/enum-ordinalize"
 homepage = "https://magiclen.org/enum-ordinalize"
@@ -10,9 +10,9 @@ description= "This crates provides `create_ordinalized_enum` macro to let enums 
 readme = "README.md"
 license = "MIT"
 
-[badges]
-travis-ci = { repository = "magiclen/enum-ordinalize", branch = "master" }
-appveyor = { repository = "magiclen/enum-ordinalize", branch = "master", service = "github" }
+[badges.travis-ci]
+repository = "magiclen/enum-ordinalize"
+branch = "master"
 
 [dependencies]
 
