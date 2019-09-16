@@ -6,11 +6,7 @@ extern crate enum_ordinalize;
 
 #[test]
 fn create_ordinalized_enum_1_5() {
-    create_ordinalized_enum!(MyEnum: u128,
-        Zero,
-        One,
-        Two
-    );
+    create_ordinalized_enum!(MyEnum: u128, Zero, One, Two);
 
     assert_eq!(0u128, MyEnum::Zero.ordinal());
     assert_eq!(1u128, MyEnum::One.ordinal());
@@ -48,11 +44,7 @@ fn create_ordinalized_enum_1_6() {
 
 #[test]
 fn create_ordinalized_enum_2_5() {
-    create_ordinalized_enum!(MyEnum: u128,
-        Two = 2,
-        Four = 4,
-        Eight = 8
-    );
+    create_ordinalized_enum!(MyEnum: u128, Two = 2, Four = 4, Eight = 8);
 
     assert_eq!(2u128, MyEnum::Two.ordinal());
     assert_eq!(4u128, MyEnum::Four.ordinal());
