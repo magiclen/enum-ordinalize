@@ -46,7 +46,7 @@ impl VariantType {
     #[inline]
     pub(crate) fn as_str(&self) -> &'static str {
         match self {
-            VariantType::ISIZE => "iszie",
+            VariantType::ISIZE => "isize",
             VariantType::I8 => "i8",
             VariantType::I16 => "i16",
             VariantType::I32 => "i32",

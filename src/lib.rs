@@ -154,7 +154,6 @@ mod big_int_wrapper;
 mod panic;
 mod variant_type;
 
-use core::ops::{AddAssign, Neg};
 use core::str::FromStr;
 
 use alloc::string::ToString;
@@ -203,35 +202,37 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                 panic::no_variant();
             }
 
-            let mut min = BigInt::from(usize::max_value());
-            let mut max = BigInt::from(isize::min_value());
-            let mut counter = BigInt::default();
             let mut values: Vec<BigIntWrapper> = Vec::with_capacity(data.variants.len());
             let mut variant_idents: Vec<&Ident> = Vec::with_capacity(data.variants.len());
+            let mut use_constant_counter = false;
 
-            for variant in data.variants.iter() {
-                if let Fields::Unit = variant.fields {
-                    let value = if let Some((_, exp)) = variant.discriminant.as_ref() {
-                        match exp {
-                            Expr::Lit(lit) => {
-                                let lit = &lit.lit;
+            let repr128 = if VariantType::Nondetermined == variant_type {
+                let mut min = BigInt::from(u128::max_value());
+                let mut max = BigInt::from(i128::min_value());
+                let mut counter = BigInt::default();
 
-                                let value = match lit {
-                                    Lit::Int(value) => {
-                                        let value = value.base10_digits();
-                                        BigInt::from_str(value).unwrap()
-                                    }
-                                    _ => panic::unsupported_discriminant(),
-                                };
+                for variant in data.variants.iter() {
+                    if let Fields::Unit = variant.fields {
+                        let value = if let Some((_, exp)) = variant.discriminant.as_ref() {
+                            match exp {
+                                Expr::Lit(lit) => {
+                                    let lit = &lit.lit;
 
-                                counter = value.clone();
+                                    let value = match lit {
+                                        Lit::Int(value) => {
+                                            let value = value.base10_digits();
+                                            BigInt::from_str(value).unwrap()
+                                        }
+                                        _ => panic::unsupported_discriminant(),
+                                    };
 
-                                value
-                            }
-                            Expr::Unary(unary) => {
-                                match unary.op {
-                                    UnOp::Neg(_) => {
-                                        match unary.expr.as_ref() {
+                                    counter = value.clone();
+
+                                    value
+                                }
+                                Expr::Unary(unary) => {
+                                    match unary.op {
+                                        UnOp::Neg(_) => match unary.expr.as_ref() {
                                             Expr::Lit(lit) => {
                                                 let lit = &lit.lit;
 
@@ -239,7 +240,7 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                                                     Lit::Int(value) => {
                                                         let value = value.base10_digits();
 
-                                                        BigInt::from_str(value).unwrap().neg()
+                                                        -BigInt::from_str(value).unwrap()
                                                     }
                                                     _ => panic::unsupported_discriminant(),
                                                 };
@@ -248,72 +249,182 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
 
                                                 value
                                             }
+                                            Expr::Path(_)
+                                            | Expr::Cast(_)
+                                            | Expr::Binary(_)
+                                            | Expr::Call(_) => {
+                                                panic::constant_variable_on_non_determined_size_enum(
+                                                )
+                                            }
                                             _ => panic::unsupported_discriminant(),
-                                        }
+                                        },
+                                        _ => panic::unsupported_discriminant(),
                                     }
-                                    _ => panic::unsupported_discriminant(),
                                 }
+                                Expr::Path(_) | Expr::Cast(_) | Expr::Binary(_) | Expr::Call(_) => {
+                                    panic::constant_variable_on_non_determined_size_enum()
+                                }
+                                _ => panic::unsupported_discriminant(),
                             }
-                            _ => panic::unsupported_discriminant(),
+                        } else {
+                            counter.clone()
+                        };
+
+                        if min > value {
+                            min = value.clone();
                         }
+
+                        if max < value {
+                            max = value.clone();
+                        }
+
+                        variant_idents.push(&variant.ident);
+
+                        counter += 1;
+
+                        values.push(BigIntWrapper::from(value));
                     } else {
-                        counter.clone()
-                    };
-
-                    if min > value {
-                        min = value.clone();
+                        panic::not_unit_variant();
                     }
+                }
 
-                    if max < value {
-                        max = value.clone();
-                    }
+                if min >= BigInt::from(i8::min_value()) && max <= BigInt::from(i8::max_value()) {
+                    variant_type = VariantType::I8;
 
-                    values.push(BigIntWrapper::from(value));
-                    variant_idents.push(&variant.ident);
+                    false
+                } else if min >= BigInt::from(i16::min_value())
+                    && max <= BigInt::from(i16::max_value())
+                {
+                    variant_type = VariantType::I16;
 
-                    counter.add_assign(1);
+                    false
+                } else if min >= BigInt::from(i32::min_value())
+                    && max <= BigInt::from(i32::max_value())
+                {
+                    variant_type = VariantType::I32;
+
+                    false
+                } else if min >= BigInt::from(i64::min_value())
+                    && max <= BigInt::from(i64::max_value())
+                {
+                    variant_type = VariantType::I64;
+
+                    false
+                } else if min >= BigInt::from(i128::min_value())
+                    && max <= BigInt::from(i128::max_value())
+                {
+                    variant_type = VariantType::I128;
+
+                    true
                 } else {
-                    panic::not_unit_variant();
+                    panic::unsupported_discriminant()
                 }
-            }
+            } else {
+                let mut counter = BigInt::default();
+                let mut constant_counter = 0;
+                let mut last_exp: Option<&Expr> = None;
 
-            let repr128 = match variant_type {
-                VariantType::Nondetermined => {
-                    if min >= BigInt::from(i8::min_value()) && max <= BigInt::from(i8::max_value())
-                    {
-                        variant_type = VariantType::I8;
+                for variant in data.variants.iter() {
+                    if let Fields::Unit = variant.fields {
+                        if let Some((_, exp)) = variant.discriminant.as_ref() {
+                            match exp {
+                                Expr::Lit(lit) => {
+                                    let lit = &lit.lit;
 
-                        false
-                    } else if min >= BigInt::from(i16::min_value())
-                        && max <= BigInt::from(i16::max_value())
-                    {
-                        variant_type = VariantType::I16;
+                                    let value = match lit {
+                                        Lit::Int(value) => {
+                                            let value = value.base10_digits();
+                                            BigInt::from_str(value).unwrap()
+                                        }
+                                        _ => panic::unsupported_discriminant(),
+                                    };
 
-                        false
-                    } else if min >= BigInt::from(i32::min_value())
-                        && max <= BigInt::from(i32::max_value())
-                    {
-                        variant_type = VariantType::I32;
+                                    values.push(BigIntWrapper::from(value.clone()));
 
-                        false
-                    } else if min >= BigInt::from(i64::min_value())
-                        && max <= BigInt::from(i64::max_value())
-                    {
-                        variant_type = VariantType::I64;
+                                    counter = value + 1;
 
-                        false
-                    } else if min >= BigInt::from(i128::min_value())
-                        && max <= BigInt::from(i128::max_value())
-                    {
-                        variant_type = VariantType::I128;
+                                    last_exp = None;
+                                }
+                                Expr::Unary(unary) => {
+                                    match unary.op {
+                                        UnOp::Neg(_) => {
+                                            match unary.expr.as_ref() {
+                                                Expr::Lit(lit) => {
+                                                    let lit = &lit.lit;
 
-                        true
+                                                    let value = match lit {
+                                                        Lit::Int(value) => {
+                                                            let value = value.base10_digits();
+
+                                                            -BigInt::from_str(value).unwrap()
+                                                        }
+                                                        _ => panic::unsupported_discriminant(),
+                                                    };
+
+                                                    values.push(BigIntWrapper::from(value.clone()));
+
+                                                    counter = value + 1;
+
+                                                    last_exp = None;
+                                                }
+                                                Expr::Path(_) => {
+                                                    values.push(BigIntWrapper::from((exp, 0)));
+
+                                                    last_exp = Some(exp);
+                                                    constant_counter = 1;
+                                                }
+                                                Expr::Cast(_) | Expr::Binary(_) | Expr::Call(_) => {
+                                                    values.push(BigIntWrapper::from((exp, 0)));
+
+                                                    last_exp = Some(exp);
+                                                    constant_counter = 1;
+
+                                                    use_constant_counter = true;
+                                                }
+                                                _ => panic::unsupported_discriminant(),
+                                            }
+                                        }
+                                        _ => panic::unsupported_discriminant(),
+                                    }
+                                }
+                                Expr::Path(_) => {
+                                    values.push(BigIntWrapper::from((exp, 0)));
+
+                                    last_exp = Some(exp);
+                                    constant_counter = 1;
+                                }
+                                Expr::Cast(_) | Expr::Binary(_) | Expr::Call(_) => {
+                                    values.push(BigIntWrapper::from((exp, 0)));
+
+                                    last_exp = Some(exp);
+                                    constant_counter = 1;
+
+                                    use_constant_counter = true;
+                                }
+                                _ => panic::unsupported_discriminant(),
+                            }
+                        } else if let Some(exp) = last_exp.as_ref() {
+                            values.push(BigIntWrapper::from((*exp, constant_counter)));
+
+                            constant_counter += 1;
+
+                            use_constant_counter = true;
+                        } else {
+                            values.push(BigIntWrapper::from(counter.clone()));
+
+                            counter += 1;
+                        }
+
+                        variant_idents.push(&variant.ident);
                     } else {
-                        panic::unsupported_discriminant()
+                        panic::not_unit_variant();
                     }
                 }
-                VariantType::I128 | VariantType::U128 => true,
-                _ => false,
+
+                match variant_type {
+                    VariantType::I128 | VariantType::U128 => true,
+                    _ => false,
+                }
             };
 
             let ordinal = if repr128 {
@@ -349,14 +460,29 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                 }
             };
 
-            let from_ordinal = quote! {
-                #[inline]
-                pub fn from_ordinal(number: #variant_type) -> Option<#name #ty_generics> {
-                    match number{
-                        #(
-                            #values => Some(Self::#variant_idents),
-                        )*
-                        _ => None
+            let from_ordinal = if use_constant_counter {
+                quote! {
+                    #[inline]
+                    pub fn from_ordinal(number: #variant_type) -> Option<#name #ty_generics> {
+                        if false {
+                            unreachable!()
+                        } #( else if number == #values {
+                            Some(Self::#variant_idents)
+                        } )* else {
+                            None
+                        }
+                    }
+                }
+            } else {
+                quote! {
+                    #[inline]
+                    pub fn from_ordinal(number: #variant_type) -> Option<#name #ty_generics> {
+                        match number{
+                            #(
+                                #values => Some(Self::#variant_idents),
+                            )*
+                            _ => None
+                        }
                     }
                 }
             };
