@@ -111,7 +111,7 @@ assert_eq!(MyEnum::One, unsafe { MyEnum::from_ordinal_unsafe(1usize) });
 assert_eq!(MyEnum::Two, unsafe { MyEnum::from_ordinal_unsafe(2usize) });
 ```
 
-## Useful Increment
+## Useful Increments
 
 The integers represented by variants are extended in successive increments and can be set explicitly from anywhere.
 
