@@ -5,7 +5,7 @@ This crates provides a procedural macro to let enums not only get its variants' 
 
 ## Ordinalize
 
-Use `#[derive(Ordinalize)]` to make an enum (which must only has unit variants) has `from_ordinal_unsafe`, `from_ordinal`, `variants`, and `variant_count` associated functions and a `ordinal` method.
+Use `#[derive(Ordinalize)]` to make an enum (which must only has unit variants) have `from_ordinal_unsafe`, `from_ordinal`, `variants`, and `variant_count` associated functions and a `ordinal` method.
 
 ```rust
 #[macro_use] extern crate enum_ordinalize;
