@@ -154,6 +154,9 @@ mod big_int_wrapper;
 mod panic;
 mod variant_type;
 
+#[macro_use]
+extern crate if_rust_version;
+
 use core::str::FromStr;
 
 use alloc::string::ToString;
@@ -172,21 +175,21 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
     let mut variant_type = VariantType::default();
 
     for attr in ast.attrs.iter() {
-        let attr_meta = attr.parse_meta().unwrap();
+        if let Some(attr_meta_name) = attr.path.get_ident() {
+            if attr_meta_name == "repr" {
+                // #[repr(u8)], #[repr(u16)], ..., etc.
+                let attr_meta = attr.parse_meta().unwrap();
 
-        let attr_meta_name = attr_meta.path().into_token_stream().to_string();
+                if let Meta::List(list) = attr_meta {
+                    for p in &list.nested {
+                        if let NestedMeta::Meta(meta) = p {
+                            if let Meta::Path(path) = meta {
+                                let meta_name = path.into_token_stream().to_string();
 
-        if attr_meta_name.as_str() == "repr" {
-            // #[repr(u8)], #[repr(u16)], ..., etc.
-            if let Meta::List(list) = attr_meta {
-                for p in &list.nested {
-                    if let NestedMeta::Meta(meta) = p {
-                        if let Meta::Path(path) = meta {
-                            let meta_name = path.into_token_stream().to_string();
+                                variant_type = VariantType::from_str(meta_name);
 
-                            variant_type = VariantType::from_str(meta_name);
-
-                            break;
+                                break;
+                            }
                         }
                     }
                 }
@@ -206,7 +209,7 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
             let mut variant_idents: Vec<&Ident> = Vec::with_capacity(data.variants.len());
             let mut use_constant_counter = false;
 
-            let repr128 = if VariantType::Nondetermined == variant_type {
+            let _has_repr = if VariantType::Nondetermined == variant_type {
                 let mut min = BigInt::from(u128::max_value());
                 let mut max = BigInt::from(i128::min_value());
                 let mut counter = BigInt::default();
@@ -290,35 +293,27 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
 
                 if min >= BigInt::from(i8::min_value()) && max <= BigInt::from(i8::max_value()) {
                     variant_type = VariantType::I8;
-
-                    false
                 } else if min >= BigInt::from(i16::min_value())
                     && max <= BigInt::from(i16::max_value())
                 {
                     variant_type = VariantType::I16;
-
-                    false
                 } else if min >= BigInt::from(i32::min_value())
                     && max <= BigInt::from(i32::max_value())
                 {
                     variant_type = VariantType::I32;
-
-                    false
                 } else if min >= BigInt::from(i64::min_value())
                     && max <= BigInt::from(i64::max_value())
                 {
                     variant_type = VariantType::I64;
-
-                    false
                 } else if min >= BigInt::from(i128::min_value())
                     && max <= BigInt::from(i128::max_value())
                 {
                     variant_type = VariantType::I128;
-
-                    true
                 } else {
                     panic::unsupported_discriminant()
                 }
+
+                false
             } else {
                 let mut counter = BigInt::default();
                 let mut constant_counter = 0;
@@ -421,13 +416,33 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                     }
                 }
 
-                match variant_type {
-                    VariantType::I128 | VariantType::U128 => true,
-                    _ => false,
-                }
+                true
             };
 
-            let ordinal = if repr128 {
+            // TODO `std::mem::discriminant` is pretty unstable because Rust 1.46 has made some changes.
+            let ordinal = if_rust_version! { >= 1.46 {
+                if _has_repr {
+                    quote! {
+                        #[inline]
+                        pub fn ordinal(&self) -> #variant_type {
+                            unsafe {
+                                ::std::mem::transmute(::std::mem::discriminant(self))
+                            }
+                        }
+                    }
+                } else {
+                    quote! {
+                        #[inline]
+                        pub fn ordinal(&self) -> #variant_type {
+                            let n: usize = unsafe {
+                                ::std::mem::transmute(::std::mem::discriminant(self))
+                            };
+
+                            n as #variant_type
+                        }
+                    }
+                }
+            } else {
                 quote! {
                     #[inline]
                     pub fn ordinal(&self) -> #variant_type {
@@ -438,18 +453,7 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                         }
                     }
                 }
-            } else {
-                quote! {
-                    #[inline]
-                    pub fn ordinal(&self) -> #variant_type {
-                        let n: u64 = unsafe {
-                            ::std::mem::transmute(::std::mem::discriminant(self))
-                        };
-
-                        n as #variant_type
-                    }
-                }
-            };
+            }};
 
             let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
 

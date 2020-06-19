@@ -14,10 +14,10 @@ fn create_ordinalized_enum_5_1() {
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[repr(i8)]
     enum MyEnum {
-        Two = 0 + 2,
-        Four = FOUR,
+        Two   = 0 + 2,
+        Four  = FOUR,
         Eight = eight(),
-        Ten = TEN as i8,
+        Ten   = TEN as i8,
     }
 
     assert_eq!(2i8, MyEnum::Two.ordinal());
@@ -43,13 +43,13 @@ fn create_ordinalized_enum_5_2() {
     enum MyEnum {
         Zero,
         One,
-        Two = 0 + 2,
+        Two     = 0 + 2,
         Three,
         Four,
-        Six = FOUR + 2,
+        Six     = FOUR + 2,
         Seven,
         Eight,
-        Ten = TEN as i8,
+        Ten     = TEN as i8,
         Eleven,
         Twelve,
         Hundred = 100,
