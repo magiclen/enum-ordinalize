@@ -419,14 +419,14 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                 true
             };
 
-            // TODO `std::mem::discriminant` is pretty unstable because Rust 1.46 has made some changes.
+            // TODO `core::mem::discriminant` is pretty unstable because Rust 1.46 has made some changes.
             let ordinal = if_rust_version! { >= 1.46 {
                 if _has_repr {
                     quote! {
                         #[inline]
                         pub fn ordinal(&self) -> #variant_type {
                             unsafe {
-                                ::std::mem::transmute(::std::mem::discriminant(self))
+                                ::core::mem::transmute(::core::mem::discriminant(self))
                             }
                         }
                     }
@@ -435,7 +435,7 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                         #[inline]
                         pub fn ordinal(&self) -> #variant_type {
                             let n: usize = unsafe {
-                                ::std::mem::transmute(::std::mem::discriminant(self))
+                                ::core::mem::transmute(::core::mem::discriminant(self))
                             };
 
                             n as #variant_type
@@ -460,7 +460,7 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
             let from_ordinal_unsafe = quote! {
                 #[inline]
                 pub unsafe fn from_ordinal_unsafe(number: #variant_type) -> #name #ty_generics {
-                    ::std::mem::transmute(number)
+                    ::core::mem::transmute(number)
                 }
             };
 

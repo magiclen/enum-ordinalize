@@ -1,12 +1,12 @@
 [package]
 name = "enum-ordinalize"
-version = "3.1.2"
+version = "3.1.3"
 authors = ["Magic Len <len@magiclen.org>"]
 edition = "2018"
 repository = "https://github.com/magiclen/enum-ordinalize"
 homepage = "https://magiclen.org/enum-ordinalize"
 keywords = ["enum", "ordinal", "ordinalize", "number"]
-categories = ["data-structures", "no-std"]
+categories = ["no-std", "data-structures"]
 description= "This crates provides a procedural macro to let enums not only get its variants' ordinal but also be constructed from an ordinal."
 readme = "README.md"
 license = "MIT"
