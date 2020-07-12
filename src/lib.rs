@@ -457,10 +457,21 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
 
             let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
 
-            let from_ordinal_unsafe = quote! {
-                #[inline]
-                pub unsafe fn from_ordinal_unsafe(number: #variant_type) -> #name #ty_generics {
-                    ::core::mem::transmute(number)
+            let from_ordinal_unsafe = if data.variants.len() == 1 {
+                let variant_idents = &data.variants[0].ident;
+
+                quote! {
+                    #[inline]
+                    pub unsafe fn from_ordinal_unsafe(_number: #variant_type) -> #name #ty_generics {
+                        Self::#variant_idents
+                    }
+                }
+            } else {
+                quote! {
+                    #[inline]
+                    pub unsafe fn from_ordinal_unsafe(number: #variant_type) -> #name #ty_generics {
+                        ::core::mem::transmute(number)
+                    }
                 }
             };
 

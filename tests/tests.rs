@@ -145,6 +145,20 @@ fn create_ordinalized_enum_4_2() {
 }
 
 #[test]
+fn create_ordinalized_enum_5() {
+    #[derive(Debug, PartialEq, Eq, Ordinalize)]
+    enum MyEnum {
+        Zero,
+    }
+
+    assert_eq!(0i8, MyEnum::Zero.ordinal());
+
+    assert_eq!(Some(MyEnum::Zero), MyEnum::from_ordinal(0i8));
+
+    assert_eq!(MyEnum::Zero, unsafe { MyEnum::from_ordinal_unsafe(0i8) });
+}
+
+#[test]
 fn get_variants() {
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     enum MyEnum {
