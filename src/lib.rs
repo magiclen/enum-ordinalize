@@ -419,8 +419,8 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                 true
             };
 
-            // TODO `core::mem::discriminant` is pretty unstable because Rust 1.46 has made some changes.
-            let ordinal = if_rust_version! { >= 1.46 {
+            // TODO keep tracking, it may cause problems
+            let ordinal = if_rust_version! { >= 1.45 {
                 if _has_repr {
                     quote! {
                         #[inline]
