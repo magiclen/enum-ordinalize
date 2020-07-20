@@ -154,9 +154,6 @@ mod big_int_wrapper;
 mod panic;
 mod variant_type;
 
-#[macro_use]
-extern crate if_rust_version;
-
 use core::str::FromStr;
 
 use alloc::string::ToString;
@@ -209,7 +206,7 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
             let mut variant_idents: Vec<&Ident> = Vec::with_capacity(data.variants.len());
             let mut use_constant_counter = false;
 
-            let _has_repr = if VariantType::Nondetermined == variant_type {
+            if VariantType::Nondetermined == variant_type {
                 let mut min = BigInt::from(u128::max_value());
                 let mut max = BigInt::from(i128::min_value());
                 let mut counter = BigInt::default();
@@ -312,8 +309,6 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                 } else {
                     panic::unsupported_discriminant()
                 }
-
-                false
             } else {
                 let mut counter = BigInt::default();
                 let mut constant_counter = 0;
@@ -415,45 +410,18 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                         panic::not_unit_variant();
                     }
                 }
+            }
 
-                true
+            let ordinal = quote! {
+                #[inline]
+                pub fn ordinal(&self) -> #variant_type {
+                    match self {
+                        #(
+                            Self::#variant_idents => #values,
+                        )*
+                    }
+                }
             };
-
-            // TODO keep tracking, it may cause problems
-            let ordinal = if_rust_version! { >= 1.45 {
-                if _has_repr {
-                    quote! {
-                        #[inline]
-                        pub fn ordinal(&self) -> #variant_type {
-                            unsafe {
-                                ::core::mem::transmute(::core::mem::discriminant(self))
-                            }
-                        }
-                    }
-                } else {
-                    quote! {
-                        #[inline]
-                        pub fn ordinal(&self) -> #variant_type {
-                            let n: usize = unsafe {
-                                ::core::mem::transmute(::core::mem::discriminant(self))
-                            };
-
-                            n as #variant_type
-                        }
-                    }
-                }
-            } else {
-                quote! {
-                    #[inline]
-                    pub fn ordinal(&self) -> #variant_type {
-                        match self {
-                            #(
-                                Self::#variant_idents => #values,
-                            )*
-                        }
-                    }
-                }
-            }};
 
             let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
 
