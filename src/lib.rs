@@ -179,14 +179,12 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
 
                 if let Meta::List(list) = attr_meta {
                     for p in &list.nested {
-                        if let NestedMeta::Meta(meta) = p {
-                            if let Meta::Path(path) = meta {
-                                let meta_name = path.into_token_stream().to_string();
+                        if let NestedMeta::Meta(Meta::Path(path)) = p {
+                            let meta_name = path.into_token_stream().to_string();
 
-                                variant_type = VariantType::from_str(meta_name);
+                            variant_type = VariantType::from_str(meta_name);
 
-                                break;
-                            }
+                            break;
                         }
                     }
                 }
