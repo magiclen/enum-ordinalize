@@ -1,7 +1,7 @@
 Enum Ordinalize
 ====================
 
-[![Build Status](https://travis-ci.org/magiclen/enum-ordinalize.svg?branch=master)](https://travis-ci.org/magiclen/enum-ordinalize)
+[![CI](https://github.com/magiclen/enum-ordinalize/actions/workflows/ci.yml/badge.svg)](https://github.com/magiclen/enum-ordinalize/actions/workflows/ci.yml)
 
 This crates provides a procedural macro to let enums not only get its variants' ordinal but also be constructed from an ordinal.
 
