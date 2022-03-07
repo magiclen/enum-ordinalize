@@ -14,7 +14,7 @@ fn create_ordinalized_enum_5_1() {
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[repr(i8)]
     enum MyEnum {
-        Two   = 0 + 2,
+        Two   = 1 + 1,
         Four  = FOUR,
         Eight = eight(),
         Ten   = TEN as i8,
@@ -43,7 +43,7 @@ fn create_ordinalized_enum_5_2() {
     enum MyEnum {
         Zero,
         One,
-        Two     = 0 + 2,
+        Two     = 1 + 1,
         Three,
         Four,
         Six     = FOUR + 2,

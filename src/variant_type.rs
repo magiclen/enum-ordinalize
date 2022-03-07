@@ -1,8 +1,5 @@
-extern crate proc_macro2;
-
-use crate::quote::{ToTokens, TokenStreamExt};
-
 use proc_macro2::{Ident, Span, TokenStream};
+use quote::{ToTokens, TokenStreamExt};
 
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]

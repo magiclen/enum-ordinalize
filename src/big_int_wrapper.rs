@@ -1,9 +1,6 @@
-extern crate num_traits;
-extern crate proc_macro2;
-
-use crate::num_bigint::BigInt;
-use crate::quote::{ToTokens, TokenStreamExt};
-use crate::syn::Expr;
+use num_bigint::BigInt;
+use quote::{quote, ToTokens, TokenStreamExt};
+use syn::Expr;
 
 use num_traits::{Signed, ToPrimitive};
 use proc_macro2::{Literal, TokenStream};

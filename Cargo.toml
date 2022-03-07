@@ -1,8 +1,8 @@
 [package]
 name = "enum-ordinalize"
-version = "3.1.10"
+version = "3.1.11"
 authors = ["Magic Len <len@magiclen.org>"]
-edition = "2018"
+edition = "2021"
 repository = "https://github.com/magiclen/enum-ordinalize"
 homepage = "https://magiclen.org/enum-ordinalize"
 keywords = ["enum", "ordinal", "ordinalize", "number"]
@@ -14,6 +14,9 @@ include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
 [lib]
 proc-macro = true
+
+[build-dependencies]
+rustc_version = "0.4"
 
 [dependencies]
 proc-macro2 = "1"

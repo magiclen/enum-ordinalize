@@ -142,13 +142,6 @@ assert_eq!(MyEnum::NegativeNine, unsafe { MyEnum::from_ordinal_unsafe(-9i8) });
 #![no_std]
 
 extern crate alloc;
-extern crate proc_macro;
-extern crate syn;
-
-#[macro_use]
-extern crate quote;
-
-extern crate num_bigint;
 
 mod big_int_wrapper;
 mod panic;
@@ -160,7 +153,7 @@ use alloc::string::ToString;
 use alloc::vec::Vec;
 
 use proc_macro::TokenStream;
-use quote::ToTokens;
+use quote::{quote, ToTokens};
 use syn::{Data, DeriveInput, Expr, Fields, Ident, Lit, Meta, NestedMeta, UnOp};
 
 use num_bigint::BigInt;
