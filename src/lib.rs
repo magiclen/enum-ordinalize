@@ -198,8 +198,8 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
             let mut use_constant_counter = false;
 
             if VariantType::Nondetermined == variant_type {
-                let mut min = BigInt::from(u128::max_value());
-                let mut max = BigInt::from(i128::min_value());
+                let mut min = BigInt::from(u128::MAX);
+                let mut max = BigInt::from(i128::MIN);
                 let mut counter = BigInt::default();
 
                 for variant in data.variants.iter() {
@@ -279,23 +279,15 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                     }
                 }
 
-                if min >= BigInt::from(i8::min_value()) && max <= BigInt::from(i8::max_value()) {
+                if min >= BigInt::from(i8::MIN) && max <= BigInt::from(i8::MAX) {
                     variant_type = VariantType::I8;
-                } else if min >= BigInt::from(i16::min_value())
-                    && max <= BigInt::from(i16::max_value())
-                {
+                } else if min >= BigInt::from(i16::MIN) && max <= BigInt::from(i16::MAX) {
                     variant_type = VariantType::I16;
-                } else if min >= BigInt::from(i32::min_value())
-                    && max <= BigInt::from(i32::max_value())
-                {
+                } else if min >= BigInt::from(i32::MIN) && max <= BigInt::from(i32::MAX) {
                     variant_type = VariantType::I32;
-                } else if min >= BigInt::from(i64::min_value())
-                    && max <= BigInt::from(i64::max_value())
-                {
+                } else if min >= BigInt::from(i64::MIN) && max <= BigInt::from(i64::MAX) {
                     variant_type = VariantType::I64;
-                } else if min >= BigInt::from(i128::min_value())
-                    && max <= BigInt::from(i128::max_value())
-                {
+                } else if min >= BigInt::from(i128::MIN) && max <= BigInt::from(i128::MAX) {
                     variant_type = VariantType::I128;
                 } else {
                     panic::unsupported_discriminant()
