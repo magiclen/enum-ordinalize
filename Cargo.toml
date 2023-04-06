@@ -3,6 +3,7 @@ name = "enum-ordinalize"
 version = "3.1.12"
 authors = ["Magic Len <len@magiclen.org>"]
 edition = "2021"
+rust-version = "1.56"
 repository = "https://github.com/magiclen/enum-ordinalize"
 homepage = "https://magiclen.org/enum-ordinalize"
 keywords = ["enum", "ordinal", "ordinalize", "number"]

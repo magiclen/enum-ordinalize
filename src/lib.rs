@@ -147,18 +147,14 @@ mod big_int_wrapper;
 mod panic;
 mod variant_type;
 
+use alloc::{string::ToString, vec::Vec};
 use core::str::FromStr;
 
-use alloc::string::ToString;
-use alloc::vec::Vec;
-
+use big_int_wrapper::BigIntWrapper;
+use num_bigint::BigInt;
 use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
 use syn::{Data, DeriveInput, Expr, Fields, Ident, Lit, Meta, NestedMeta, UnOp};
-
-use num_bigint::BigInt;
-
-use big_int_wrapper::BigIntWrapper;
 use variant_type::VariantType;
 
 fn derive_input_handler(ast: DeriveInput) -> TokenStream {
@@ -213,48 +209,45 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                                         Lit::Int(value) => {
                                             let value = value.base10_digits();
                                             BigInt::from_str(value).unwrap()
-                                        }
+                                        },
                                         _ => panic::unsupported_discriminant(),
                                     };
 
                                     counter = value.clone();
 
                                     value
-                                }
-                                Expr::Unary(unary) => {
-                                    match unary.op {
-                                        UnOp::Neg(_) => match unary.expr.as_ref() {
-                                            Expr::Lit(lit) => {
-                                                let lit = &lit.lit;
+                                },
+                                Expr::Unary(unary) => match unary.op {
+                                    UnOp::Neg(_) => match unary.expr.as_ref() {
+                                        Expr::Lit(lit) => {
+                                            let lit = &lit.lit;
 
-                                                let value = match lit {
-                                                    Lit::Int(value) => {
-                                                        let value = value.base10_digits();
+                                            let value = match lit {
+                                                Lit::Int(value) => {
+                                                    let value = value.base10_digits();
 
-                                                        -BigInt::from_str(value).unwrap()
-                                                    }
-                                                    _ => panic::unsupported_discriminant(),
-                                                };
+                                                    -BigInt::from_str(value).unwrap()
+                                                },
+                                                _ => panic::unsupported_discriminant(),
+                                            };
 
-                                                counter = value.clone();
+                                            counter = value.clone();
 
-                                                value
-                                            }
-                                            Expr::Path(_)
-                                            | Expr::Cast(_)
-                                            | Expr::Binary(_)
-                                            | Expr::Call(_) => {
-                                                panic::constant_variable_on_non_determined_size_enum(
-                                                )
-                                            }
-                                            _ => panic::unsupported_discriminant(),
+                                            value
+                                        },
+                                        Expr::Path(_)
+                                        | Expr::Cast(_)
+                                        | Expr::Binary(_)
+                                        | Expr::Call(_) => {
+                                            panic::constant_variable_on_non_determined_size_enum()
                                         },
                                         _ => panic::unsupported_discriminant(),
-                                    }
-                                }
+                                    },
+                                    _ => panic::unsupported_discriminant(),
+                                },
                                 Expr::Path(_) | Expr::Cast(_) | Expr::Binary(_) | Expr::Call(_) => {
                                     panic::constant_variable_on_non_determined_size_enum()
-                                }
+                                },
                                 _ => panic::unsupported_discriminant(),
                             }
                         } else {
@@ -308,7 +301,7 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                                         Lit::Int(value) => {
                                             let value = value.base10_digits();
                                             BigInt::from_str(value).unwrap()
-                                        }
+                                        },
                                         _ => panic::unsupported_discriminant(),
                                     };
 
@@ -317,55 +310,51 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                                     counter = value + 1;
 
                                     last_exp = None;
-                                }
-                                Expr::Unary(unary) => {
-                                    match unary.op {
-                                        UnOp::Neg(_) => {
-                                            match unary.expr.as_ref() {
-                                                Expr::Lit(lit) => {
-                                                    let lit = &lit.lit;
+                                },
+                                Expr::Unary(unary) => match unary.op {
+                                    UnOp::Neg(_) => match unary.expr.as_ref() {
+                                        Expr::Lit(lit) => {
+                                            let lit = &lit.lit;
 
-                                                    let value = match lit {
-                                                        Lit::Int(value) => {
-                                                            let value = value.base10_digits();
+                                            let value = match lit {
+                                                Lit::Int(value) => {
+                                                    let value = value.base10_digits();
 
-                                                            -BigInt::from_str(value).unwrap()
-                                                        }
-                                                        _ => panic::unsupported_discriminant(),
-                                                    };
-
-                                                    values.push(BigIntWrapper::from(value.clone()));
-
-                                                    counter = value + 1;
-
-                                                    last_exp = None;
-                                                }
-                                                Expr::Path(_) => {
-                                                    values.push(BigIntWrapper::from((exp, 0)));
-
-                                                    last_exp = Some(exp);
-                                                    constant_counter = 1;
-                                                }
-                                                Expr::Cast(_) | Expr::Binary(_) | Expr::Call(_) => {
-                                                    values.push(BigIntWrapper::from((exp, 0)));
-
-                                                    last_exp = Some(exp);
-                                                    constant_counter = 1;
-
-                                                    use_constant_counter = true;
-                                                }
+                                                    -BigInt::from_str(value).unwrap()
+                                                },
                                                 _ => panic::unsupported_discriminant(),
-                                            }
-                                        }
+                                            };
+
+                                            values.push(BigIntWrapper::from(value.clone()));
+
+                                            counter = value + 1;
+
+                                            last_exp = None;
+                                        },
+                                        Expr::Path(_) => {
+                                            values.push(BigIntWrapper::from((exp, 0)));
+
+                                            last_exp = Some(exp);
+                                            constant_counter = 1;
+                                        },
+                                        Expr::Cast(_) | Expr::Binary(_) | Expr::Call(_) => {
+                                            values.push(BigIntWrapper::from((exp, 0)));
+
+                                            last_exp = Some(exp);
+                                            constant_counter = 1;
+
+                                            use_constant_counter = true;
+                                        },
                                         _ => panic::unsupported_discriminant(),
-                                    }
-                                }
+                                    },
+                                    _ => panic::unsupported_discriminant(),
+                                },
                                 Expr::Path(_) => {
                                     values.push(BigIntWrapper::from((exp, 0)));
 
                                     last_exp = Some(exp);
                                     constant_counter = 1;
-                                }
+                                },
                                 Expr::Cast(_) | Expr::Binary(_) | Expr::Call(_) => {
                                     values.push(BigIntWrapper::from((exp, 0)));
 
@@ -373,7 +362,7 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
                                     constant_counter = 1;
 
                                     use_constant_counter = true;
-                                }
+                                },
                                 _ => panic::unsupported_discriminant(),
                             }
                         } else if let Some(exp) = last_exp.as_ref() {
@@ -484,10 +473,10 @@ fn derive_input_handler(ast: DeriveInput) -> TokenStream {
             };
 
             ordinalize_impl.into()
-        }
+        },
         _ => {
             panic::not_enum();
-        }
+        },
     }
 }
 

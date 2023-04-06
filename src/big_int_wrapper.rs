@@ -1,9 +1,8 @@
 use num_bigint::BigInt;
-use quote::{quote, ToTokens, TokenStreamExt};
-use syn::Expr;
-
 use num_traits::{Signed, ToPrimitive};
 use proc_macro2::{Literal, TokenStream};
+use quote::{quote, ToTokens, TokenStreamExt};
+use syn::Expr;
 
 pub(crate) enum BigIntWrapper<'a> {
     Integer(BigInt),
@@ -36,7 +35,7 @@ impl<'a> ToTokens for BigIntWrapper<'a> {
                 };
 
                 tokens.append(lit);
-            }
+            },
             BigIntWrapper::Constant(expr, counter) => {
                 let counter = *counter;
 
@@ -46,7 +45,7 @@ impl<'a> ToTokens for BigIntWrapper<'a> {
                 } else {
                     tokens.extend(quote!(#expr));
                 }
-            }
+            },
         }
     }
 }
