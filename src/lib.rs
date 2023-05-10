@@ -153,30 +153,20 @@ use core::str::FromStr;
 use big_int_wrapper::BigIntWrapper;
 use num_bigint::BigInt;
 use proc_macro::TokenStream;
-use quote::{quote, ToTokens};
-use syn::{Data, DeriveInput, Expr, Fields, Ident, Lit, Meta, NestedMeta, UnOp};
+use quote::quote;
+use syn::{Data, DeriveInput, Expr, Fields, Ident, Lit, Meta, UnOp};
 use variant_type::VariantType;
 
 fn derive_input_handler(ast: DeriveInput) -> TokenStream {
     let mut variant_type = VariantType::default();
 
-    for attr in ast.attrs.iter() {
-        if let Some(attr_meta_name) = attr.path.get_ident() {
-            if attr_meta_name == "repr" {
-                // #[repr(u8)], #[repr(u16)], ..., etc.
-                let attr_meta = attr.parse_meta().unwrap();
+    for attr in ast.attrs {
+        if attr.path().is_ident("repr") {
+            // #[repr(u8)], #[repr(u16)], ..., etc.
+            if let Meta::List(list) = attr.meta {
+                let typ_name = list.tokens.to_string();
 
-                if let Meta::List(list) = attr_meta {
-                    for p in &list.nested {
-                        if let NestedMeta::Meta(Meta::Path(path)) = p {
-                            let meta_name = path.into_token_stream().to_string();
-
-                            variant_type = VariantType::from_str(meta_name);
-
-                            break;
-                        }
-                    }
-                }
+                variant_type = VariantType::from_str(typ_name);
             }
         }
     }
