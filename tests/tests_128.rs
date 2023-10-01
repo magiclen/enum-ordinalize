@@ -2,8 +2,7 @@
 #![allow(incomplete_features)]
 #![feature(repr128)]
 
-#[macro_use]
-extern crate enum_ordinalize;
+use enum_ordinalize::Ordinalize;
 
 #[test]
 fn create_ordinalized_enum_4_3() {

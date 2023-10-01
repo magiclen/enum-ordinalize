@@ -1,5 +1,4 @@
-#[macro_use]
-extern crate enum_ordinalize;
+use enum_ordinalize::Ordinalize;
 
 #[test]
 fn create_ordinalized_enum_1_1() {

@@ -8,7 +8,7 @@ This crates provides a procedural macro to let enums not only get its variants' 
 Use `#[derive(Ordinalize)]` to make an enum (which must only has unit variants) have `from_ordinal_unsafe`, `from_ordinal`, `variants`, and `variant_count` associated functions and a `ordinal` method.
 
 ```rust
-#[macro_use] extern crate enum_ordinalize;
+use enum_ordinalize::Ordinalize;
 
 #[derive(Debug, PartialEq, Eq, Ordinalize)]
 enum MyEnum {
@@ -33,7 +33,7 @@ assert_eq!(MyEnum::Two, unsafe { MyEnum::from_ordinal_unsafe(2i8) });
 ### Get Variants
 
 ```rust
-#[macro_use] extern crate enum_ordinalize;
+use enum_ordinalize::Ordinalize;
 
 #[derive(Debug, PartialEq, Eq, Ordinalize)]
 enum MyEnum {
@@ -55,7 +55,7 @@ The ordinal value is an integer whose size is determined by the enum itself. The
 For example,
 
 ```rust
-#[macro_use] extern crate enum_ordinalize;
+use enum_ordinalize::Ordinalize;
 
 #[derive(Debug, PartialEq, Eq, Ordinalize)]
 enum MyEnum {
@@ -83,7 +83,7 @@ In order to store `1000`, the size of `MyEnum` grows. Thus, the ordinal is in `i
 You can use the `#[repr(type)]` attribute to control the size explicitly. For instance,
 
 ```rust
-#[macro_use] extern crate enum_ordinalize;
+use enum_ordinalize::Ordinalize;
 
 #[derive(Debug, PartialEq, Eq, Ordinalize)]
 #[repr(usize)]
@@ -112,7 +112,7 @@ assert_eq!(MyEnum::Two, unsafe { MyEnum::from_ordinal_unsafe(2usize) });
 The integers represented by variants are extended in successive increments and can be set explicitly from anywhere.
 
 ```rust
-#[macro_use] extern crate enum_ordinalize;
+use enum_ordinalize::Ordinalize;
 
 #[derive(Debug, PartialEq, Eq, Ordinalize)]
 enum MyEnum {

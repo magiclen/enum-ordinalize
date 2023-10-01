@@ -1,5 +1,4 @@
-#[macro_use]
-extern crate enum_ordinalize;
+use enum_ordinalize::Ordinalize;
 
 const FOUR: i8 = 4;
 
