@@ -1,27 +1,6 @@
-[package]
-name = "enum-ordinalize"
-version = "3.1.15"
-authors = ["Magic Len <len@magiclen.org>"]
-edition = "2021"
-rust-version = "1.56"
-repository = "https://github.com/magiclen/enum-ordinalize"
-homepage = "https://magiclen.org/enum-ordinalize"
-keywords = ["enum", "ordinal", "ordinalize", "number"]
-categories = ["no-std", "data-structures"]
-description = "This crates provides a procedural macro to let enums not only get its variants' ordinal but also be constructed from an ordinal."
-license = "MIT"
-include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
-
-[lib]
-proc-macro = true
-
-[dependencies]
-proc-macro2 = "1"
-syn = "2"
-quote = "1"
-
-num-traits = "0.2"
-num-bigint = "0.4"
-
-[features]
-nightly-test = []
+[workspace]
+resolver = "2"
+members = [
+    "enum-ordinalize-derive",
+    "enum-ordinalize"
+]

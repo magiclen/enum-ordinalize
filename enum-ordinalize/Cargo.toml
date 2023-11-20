@@ -1,0 +1,25 @@
+[package]
+name = "enum-ordinalize"
+version = "4.0.0"
+edition = "2021"
+rust-version = "1.56"
+repository = "https://github.com/magiclen/enum-ordinalize"
+homepage = "https://magiclen.org/enum-ordinalize"
+keywords = ["enum", "ordinal", "ordinalize", "number"]
+categories = ["no-std", "rust-patterns"]
+description = "This library enables enums to not only obtain the ordinal values of their variants but also allows for the construction of enums from an ordinal value."
+license = "MIT"
+include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
+
+[dependencies]
+enum-ordinalize-derive = { version = "4", path = "../enum-ordinalize-derive", optional = true }
+
+[features]
+default = ["derive"]
+
+derive = ["enum-ordinalize-derive"]
+
+nightly-test = []
+
+[package.metadata.docs.rs]
+all-features = true

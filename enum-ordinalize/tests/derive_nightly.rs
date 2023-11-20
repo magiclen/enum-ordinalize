@@ -1,4 +1,4 @@
-#![cfg(all(RUSTC_IS_NIGHTLY, feature = "nightly-test"))]
+#![cfg(all(feature = "derive", feature = "nightly-test"))]
 #![allow(incomplete_features)]
 #![feature(repr128)]
 

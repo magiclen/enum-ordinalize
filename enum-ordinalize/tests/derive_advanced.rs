@@ -1,3 +1,5 @@
+#![cfg(feature = "derive")]
+
 use enum_ordinalize::Ordinalize;
 
 const FOUR: i8 = 4;

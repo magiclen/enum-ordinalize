@@ -1,3 +1,5 @@
+#![cfg(feature = "derive")]
+
 use enum_ordinalize::Ordinalize;
 
 #[test]
@@ -158,19 +160,6 @@ fn create_ordinalized_enum_5() {
 }
 
 #[test]
-fn get_variants() {
-    #[derive(Debug, PartialEq, Eq, Ordinalize)]
-    enum MyEnum {
-        A,
-        B,
-        C,
-    }
-
-    assert_eq!([MyEnum::A, MyEnum::B, MyEnum::C], MyEnum::variants());
-}
-
-#[test]
-#[allow(dead_code)]
 fn get_variant_count() {
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     enum MyEnum {
@@ -179,5 +168,5 @@ fn get_variant_count() {
         C,
     }
 
-    assert_eq!(3, MyEnum::variant_count());
+    assert_eq!(3, MyEnum::VARIANT_COUNT);
 }

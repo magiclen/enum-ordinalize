@@ -1,22 +1,21 @@
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::{ToTokens, TokenStreamExt};
 
-#[allow(clippy::upper_case_acronyms)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug)]
 pub(crate) enum VariantType {
-    ISIZE,
+    ISize,
     I8,
     I16,
     I32,
     I64,
     I128,
-    USIZE,
+    USize,
     U8,
     U16,
     U32,
     U64,
     U128,
-    Nondetermined,
+    NonDetermined,
 }
 
 impl VariantType {
@@ -25,32 +24,32 @@ impl VariantType {
         let s = s.as_ref();
 
         match s {
-            "isize" => VariantType::ISIZE,
             "i8" => VariantType::I8,
             "i16" => VariantType::I16,
             "i32" => VariantType::I32,
             "i64" => VariantType::I64,
             "i128" => VariantType::I128,
-            "usize" => VariantType::USIZE,
+            "isize" => VariantType::ISize,
             "u8" => VariantType::U8,
             "u16" => VariantType::U16,
             "u32" => VariantType::U32,
             "u64" => VariantType::U64,
             "u128" => VariantType::U128,
-            _ => VariantType::Nondetermined,
+            "usize" => VariantType::USize,
+            _ => VariantType::NonDetermined,
         }
     }
 
     #[inline]
     pub(crate) fn as_str(&self) -> &'static str {
         match self {
-            VariantType::ISIZE => "isize",
+            VariantType::ISize => "isize",
             VariantType::I8 => "i8",
             VariantType::I16 => "i16",
             VariantType::I32 => "i32",
             VariantType::I64 => "i64",
             VariantType::I128 => "i128",
-            VariantType::USIZE => "usize",
+            VariantType::USize => "usize",
             VariantType::U8 => "u8",
             VariantType::U16 => "u16",
             VariantType::U32 => "u32",
@@ -64,7 +63,7 @@ impl VariantType {
 impl Default for VariantType {
     #[inline]
     fn default() -> Self {
-        VariantType::Nondetermined
+        VariantType::NonDetermined
     }
 }
 
