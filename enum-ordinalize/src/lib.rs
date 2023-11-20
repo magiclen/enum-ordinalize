@@ -10,6 +10,8 @@ Use `#[derive(Ordinalize)]` to have an enum (which must only has unit variants) 
 #### Basic Usage
 
 ```rust
+# #[cfg(feature = "derive")]
+# {
 use enum_ordinalize::Ordinalize;
 
 #[derive(Debug, PartialEq, Eq, Ordinalize)]
@@ -32,11 +34,14 @@ assert_eq!(MyEnum::One, unsafe { MyEnum::from_ordinal_unsafe(1i8) });
 assert_eq!(MyEnum::Two, unsafe { MyEnum::from_ordinal_unsafe(2i8) });
 
 assert_eq!(3usize, MyEnum::VARIANT_COUNT);
+# }
 ```
 
 #### Get Variants
 
 ```rust
+# #[cfg(feature = "derive")]
+# {
 use enum_ordinalize::Ordinalize;
 
 #[derive(Debug, PartialEq, Eq, Ordinalize)]
@@ -48,6 +53,7 @@ enum MyEnum {
 }
 
 assert_eq!([MyEnum::Zero, MyEnum::One, MyEnum::Two], MyEnum::get_variants());
+# }
 ```
 
 Note that `get_variants` is a constant associated function of `MyEnum`.
@@ -59,6 +65,8 @@ The ordinal value is an integer whose size is determined by the enum itself. The
 For example,
 
 ```rust
+# #[cfg(feature = "derive")]
+# {
 use enum_ordinalize::Ordinalize;
 
 #[derive(Debug, PartialEq, Eq, Ordinalize)]
@@ -82,6 +90,7 @@ assert_eq!(MyEnum::One, unsafe { MyEnum::from_ordinal_unsafe(1i16) });
 assert_eq!(MyEnum::Two, unsafe { MyEnum::from_ordinal_unsafe(2i16) });
 
 assert_eq!(4usize, MyEnum::VARIANT_COUNT);
+# }
 ```
 
 In order to accommodate the value `1000`, the size of `MyEnum` increases. Consequently, the ordinal is represented in `i16` instead of `i8`.
@@ -89,6 +98,8 @@ In order to accommodate the value `1000`, the size of `MyEnum` increases. Conseq
 You can utilize the `#[repr(type)]` attribute to explicitly control the size. For instance,
 
 ```rust
+# #[cfg(feature = "derive")]
+# {
 use enum_ordinalize::Ordinalize;
 
 #[derive(Debug, PartialEq, Eq, Ordinalize)]
@@ -113,6 +124,7 @@ assert_eq!(MyEnum::One, unsafe { MyEnum::from_ordinal_unsafe(1usize) });
 assert_eq!(MyEnum::Two, unsafe { MyEnum::from_ordinal_unsafe(2usize) });
 
 assert_eq!(4usize, MyEnum::VARIANT_COUNT);
+# }
 ```
 
 #### Useful Increment
@@ -120,6 +132,8 @@ assert_eq!(4usize, MyEnum::VARIANT_COUNT);
 The integers represented by variants can be extended in successive increments and set explicitly from any value.
 
 ```rust
+# #[cfg(feature = "derive")]
+# {
 use enum_ordinalize::Ordinalize;
 
 #[derive(Debug, PartialEq, Eq, Ordinalize)]
@@ -146,6 +160,7 @@ assert_eq!(MyEnum::Nine, unsafe { MyEnum::from_ordinal_unsafe(9i8) });
 assert_eq!(MyEnum::NegativeNine, unsafe { MyEnum::from_ordinal_unsafe(-9i8) });
 
 assert_eq!(7usize, MyEnum::VARIANT_COUNT);
+# }
 ```
 */
 
