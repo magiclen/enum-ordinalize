@@ -11,6 +11,8 @@
 /// impl Ordinalize for E {
 ///     type VariantType = u8;
 ///
+///     const VALUES: &'static [Self::VariantType] = &[0, 1];
+///     const VARIANTS: &'static [Self] = &[E::A, E::B];
 ///     const VARIANT_COUNT: usize = 2;
 ///
 ///     #[inline]
@@ -36,12 +38,18 @@
 ///     }
 /// }
 /// ```
-pub trait Ordinalize {
+pub trait Ordinalize: Sized + 'static {
     /// The type of the values of the variants.
     type VariantType;
 
     /// The count of variants.
     const VARIANT_COUNT: usize;
+
+    /// List of this enum's variants.
+    const VARIANTS: &'static [Self];
+
+    /// List of values for all variants of this enum.
+    const VALUES: &'static [Self::VariantType];
 
     /// Obtain a variant based on an integer number.
     ///

@@ -11,6 +11,10 @@ fn create_ordinalized_enum_1_1() {
         Two,
     }
 
+    assert_eq!(3, MyEnum::VARIANT_COUNT);
+    assert_eq!([MyEnum::Zero, MyEnum::One, MyEnum::Two], MyEnum::VARIANTS);
+    assert_eq!([0i8, 1i8, 2i8], MyEnum::VALUES);
+
     assert_eq!(0i8, MyEnum::Zero.ordinal());
     assert_eq!(1i8, MyEnum::One.ordinal());
     assert_eq!(2i8, MyEnum::Two.ordinal());
@@ -34,6 +38,10 @@ fn create_ordinalized_enum_1_2() {
         Two,
     }
 
+    assert_eq!(3, MyEnum::VARIANT_COUNT);
+    assert_eq!([MyEnum::Zero, MyEnum::One, MyEnum::Two], MyEnum::VARIANTS);
+    assert_eq!([0u64, 1u64, 2u64], MyEnum::VALUES);
+
     assert_eq!(0u64, MyEnum::Zero.ordinal());
     assert_eq!(1u64, MyEnum::One.ordinal());
     assert_eq!(2u64, MyEnum::Two.ordinal());
@@ -55,6 +63,10 @@ fn create_ordinalized_enum_2() {
         Four  = 4,
         Eight = 8,
     }
+
+    assert_eq!(3, MyEnum::VARIANT_COUNT);
+    assert_eq!([MyEnum::Two, MyEnum::Four, MyEnum::Eight], MyEnum::VARIANTS);
+    assert_eq!([2i8, 4i8, 8i8], MyEnum::VALUES);
 
     assert_eq!(2i8, MyEnum::Two.ordinal());
     assert_eq!(4i8, MyEnum::Four.ordinal());
@@ -79,6 +91,13 @@ fn create_ordinalized_enum_3() {
         Ten    = 10,
         Eleven = 11,
     }
+
+    assert_eq!(5, MyEnum::VARIANT_COUNT);
+    assert_eq!(
+        [MyEnum::Two, MyEnum::Three, MyEnum::Four, MyEnum::Ten, MyEnum::Eleven],
+        MyEnum::VARIANTS
+    );
+    assert_eq!([2i8, 3i8, 4i8, 10i8, 11i8], MyEnum::VALUES);
 
     assert_eq!(2i8, MyEnum::Two.ordinal());
     assert_eq!(3i8, MyEnum::Three.ordinal());
@@ -108,6 +127,10 @@ fn create_ordinalized_enum_4_1() {
         ThousandZeroOne,
     }
 
+    assert_eq!(3, MyEnum::VARIANT_COUNT);
+    assert_eq!([MyEnum::Zero, MyEnum::Thousand, MyEnum::ThousandZeroOne], MyEnum::VARIANTS);
+    assert_eq!([0i16, 1000i16, 1001i16], MyEnum::VALUES);
+
     assert_eq!(0i16, MyEnum::Zero.ordinal());
     assert_eq!(1000i16, MyEnum::Thousand.ordinal());
     assert_eq!(1001i16, MyEnum::ThousandZeroOne.ordinal());
@@ -129,6 +152,13 @@ fn create_ordinalized_enum_4_2() {
         NegativeThousand = -1000,
         NegativeNineHundredNinetyNine,
     }
+
+    assert_eq!(3, MyEnum::VARIANT_COUNT);
+    assert_eq!(
+        [MyEnum::Zero, MyEnum::NegativeThousand, MyEnum::NegativeNineHundredNinetyNine],
+        MyEnum::VARIANTS
+    );
+    assert_eq!([0i16, -1000i16, -999i16], MyEnum::VALUES);
 
     assert_eq!(0i16, MyEnum::Zero.ordinal());
     assert_eq!(-1000i16, MyEnum::NegativeThousand.ordinal());
@@ -152,21 +182,13 @@ fn create_ordinalized_enum_5() {
         Zero,
     }
 
+    assert_eq!(1, MyEnum::VARIANT_COUNT);
+    assert_eq!([MyEnum::Zero], MyEnum::VARIANTS);
+    assert_eq!([0i8], MyEnum::VALUES);
+
     assert_eq!(0i8, MyEnum::Zero.ordinal());
 
     assert_eq!(Some(MyEnum::Zero), MyEnum::from_ordinal(0i8));
 
     assert_eq!(MyEnum::Zero, unsafe { MyEnum::from_ordinal_unsafe(0i8) });
-}
-
-#[test]
-fn get_variant_count() {
-    #[derive(Debug, PartialEq, Eq, Ordinalize)]
-    enum MyEnum {
-        A,
-        B,
-        C,
-    }
-
-    assert_eq!(3, MyEnum::VARIANT_COUNT);
 }

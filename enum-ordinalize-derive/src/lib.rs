@@ -80,11 +80,14 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
     struct MyDeriveInput {
         ast:                 DeriveInput,
         variant_count:       usize,
+        variants:            proc_macro2::TokenStream,
+        values:              proc_macro2::TokenStream,
         variant_type:        VariantType,
         ordinal:             proc_macro2::TokenStream,
         from_ordinal_unsafe: proc_macro2::TokenStream,
         from_ordinal:        proc_macro2::TokenStream,
-        variants:            Option<proc_macro2::TokenStream>,
+        /// this is deprecated
+        variants_old_way:    Option<proc_macro2::TokenStream>,
     }
 
     impl Parse for MyDeriveInput {
@@ -437,7 +440,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                         }
                     };
 
-                    let variants = if let Some(MyVariantsParser {
+                    let variants_old_way = if let Some(MyVariantsParser {
                         vis,
                         ident,
                         meta,
@@ -461,14 +464,24 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                         None
                     };
 
+                    let variants = quote! {
+                        const VARIANTS: &'static [Self] = &[#( Self::#variant_idents, )*];
+                    };
+
+                    let values = quote! {
+                        const VALUES: &'static [#variant_type] = &[#( #values, )*];
+                    };
+
                     Ok(MyDeriveInput {
                         ast,
                         variant_count,
+                        variants,
+                        values,
                         variant_type,
                         ordinal,
                         from_ordinal_unsafe,
                         from_ordinal,
-                        variants,
+                        variants_old_way,
                     })
                 },
                 _ => Err(panic::not_enum(ast.ident.span())),
@@ -482,11 +495,13 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
     let MyDeriveInput {
         ast,
         variant_count,
+        variants,
+        values,
         variant_type,
         ordinal,
         from_ordinal_unsafe,
         from_ordinal,
-        variants,
+        variants_old_way,
     } = derive_input;
 
     // Get the identifier of the type.
@@ -499,7 +514,11 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
         impl #impl_generics Ordinalize for #name #ty_generics #where_clause {
             type VariantType = #variant_type;
 
-            const VARIANT_COUNT:usize = #variant_count;
+            const VARIANT_COUNT: usize = #variant_count;
+
+            #variants
+
+            #values
 
             #ordinal
 
@@ -509,7 +528,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
         }
     };
 
-    if let Some(variants) = variants {
+    if let Some(variants) = variants_old_way {
         expanded.extend(quote! {
             impl #impl_generics #name #ty_generics #where_clause {
                 #variants

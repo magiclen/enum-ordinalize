@@ -14,6 +14,10 @@ fn create_ordinalized_enum_4_3() {
         C = 75557863725914323419136,
     }
 
+    assert_eq!(3, MyEnum::VARIANT_COUNT);
+    assert_eq!([MyEnum::A, MyEnum::B, MyEnum::C], MyEnum::VARIANTS);
+    assert_eq!([2i128, 4i128, 75557863725914323419136i128], MyEnum::VALUES);
+
     assert_eq!(2i128, MyEnum::A.ordinal());
     assert_eq!(4i128, MyEnum::B.ordinal());
     assert_eq!(75557863725914323419136i128, MyEnum::C.ordinal());

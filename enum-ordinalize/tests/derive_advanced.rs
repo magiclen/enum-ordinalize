@@ -21,6 +21,10 @@ fn create_ordinalized_enum_5_1() {
         Ten   = TEN as i8,
     }
 
+    assert_eq!(4, MyEnum::VARIANT_COUNT);
+    assert_eq!([MyEnum::Two, MyEnum::Four, MyEnum::Eight, MyEnum::Ten], MyEnum::VARIANTS);
+    assert_eq!([2i8, 4i8, 8i8, 10i8], MyEnum::VALUES);
+
     assert_eq!(2i8, MyEnum::Two.ordinal());
     assert_eq!(4i8, MyEnum::Four.ordinal());
     assert_eq!(8i8, MyEnum::Eight.ordinal());
@@ -57,6 +61,31 @@ fn create_ordinalized_enum_5_2() {
         HundredOne,
         HundredTwo,
     }
+
+    assert_eq!(14, MyEnum::VARIANT_COUNT);
+    assert_eq!(
+        [
+            MyEnum::Zero,
+            MyEnum::One,
+            MyEnum::Two,
+            MyEnum::Three,
+            MyEnum::Four,
+            MyEnum::Six,
+            MyEnum::Seven,
+            MyEnum::Eight,
+            MyEnum::Ten,
+            MyEnum::Eleven,
+            MyEnum::Twelve,
+            MyEnum::Hundred,
+            MyEnum::HundredOne,
+            MyEnum::HundredTwo
+        ],
+        MyEnum::VARIANTS
+    );
+    assert_eq!(
+        [0i8, 1i8, 2i8, 3i8, 4i8, 6i8, 7i8, 8i8, 10i8, 11i8, 12i8, 100i8, 101i8, 102i8],
+        MyEnum::VALUES
+    );
 
     assert_eq!(0i8, MyEnum::Zero.ordinal());
     assert_eq!(1i8, MyEnum::One.ordinal());
