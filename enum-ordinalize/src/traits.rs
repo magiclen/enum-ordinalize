@@ -57,31 +57,3 @@ pub trait Ordinalize {
     /// Retrieve the integer number of this variant.
     fn ordinal(&self) -> Self::VariantType;
 }
-
-#[cfg(feature = "variants")]
-/// This trait provides an associated constant for an enum in order to list its variants.
-///
-/// ```rust
-/// use enum_ordinalize::Variants;
-///
-/// enum E {
-///     A,
-///     B,
-/// }
-///
-/// impl Variants for E {
-///     type VariantType = i8;
-///
-///     const VALUES: &'static [i8] = &[0, 1];
-///     const VARIANTS: &'static [Self] = &[E::A, E::B];
-/// }
-/// ```
-pub trait Variants: Sized + 'static {
-    type VariantType: Copy;
-
-    /// List of this enum's variants.
-    const VARIANTS: &'static [Self];
-
-    /// List of values for all variants of this enum.
-    const VALUES: &'static [Self::VariantType];
-}

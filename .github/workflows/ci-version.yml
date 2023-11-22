@@ -21,7 +21,6 @@ jobs:
           - stable
         features:
           -
-          - --features variants
           - --no-default-features
     name: Test ${{ matrix.toolchain }} on ${{ matrix.os }} (${{ matrix.features }})
     runs-on: ${{ matrix.os }}
@@ -45,7 +44,6 @@ jobs:
           - nightly
         features:
           -
-          - --features variants
           - --no-default-features
           - --features nightly-test
     name: Test ${{ matrix.toolchain }} on ${{ matrix.os }} (${{ matrix.features }})
@@ -70,7 +68,6 @@ jobs:
           - 1.56
         features:
           -
-          - --features variants
           - --no-default-features
     name: Test ${{ matrix.toolchain }} on ${{ matrix.os }} (${{ matrix.features }})
     runs-on: ${{ matrix.os }}

@@ -32,13 +32,11 @@ pub fn constant_variable_on_non_determined_size_enum(span: Span) -> syn::Error {
     )
 }
 
-#[rustfmt::skip]
 #[inline]
 pub fn ordinalize_attribute_usage(span: Span) -> syn::Error {
     syn::Error::new(
         span,
-        "The `ordinalize` attribute should be written like:\n\
-         #[ordinalize(variants(pub fn variants, doc = \"Returns an array of variants.\"))]\n\
-         #[ordinalize(variants(pub VARIANTS, doc = \"An array of variants.\"))]",
+        "The `ordinalize` attribute should be written like: #[ordinalize(variants(pub fn \
+         variants, doc = \"Returns an array of variants.\"))]",
     )
 }

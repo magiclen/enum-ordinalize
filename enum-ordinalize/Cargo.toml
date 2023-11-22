@@ -18,7 +18,6 @@ enum-ordinalize-derive = { version = "4", path = "../enum-ordinalize-derive", op
 default = ["derive"]
 
 derive = ["enum-ordinalize-derive"]
-variants = ["enum-ordinalize-derive/variants"]
 
 nightly-test = []
 
