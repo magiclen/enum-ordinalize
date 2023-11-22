@@ -69,14 +69,19 @@ pub trait Ordinalize {
 ///     B,
 /// }
 ///
-/// impl Variants<2> for E {
-///     const VARIANTS: [Self; 2] = [E::A, E::B];
+/// impl Variants for E {
+///     type VariantType = i8;
+///
+///     const VALUES: &'static [i8] = &[0, 1];
+///     const VARIANTS: &'static [Self] = &[E::A, E::B];
 /// }
 /// ```
-pub trait Variants<const VARIANT_COUNT: usize>: Sized {
-    /// The count of variants.
-    const COUNT: usize = VARIANT_COUNT;
+pub trait Variants: Sized + 'static {
+    type VariantType: Copy;
 
     /// List of this enum's variants.
-    const VARIANTS: [Self; VARIANT_COUNT];
+    const VARIANTS: &'static [Self];
+
+    /// List of values for all variants of this enum.
+    const VALUES: &'static [Self::VariantType];
 }
