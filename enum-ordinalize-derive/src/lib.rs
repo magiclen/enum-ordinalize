@@ -27,9 +27,10 @@ use crate::big_int_wrapper::BigIntWrapper;
 #[proc_macro_derive(Ordinalize, attributes(ordinalize))]
 pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
     struct MyVariantsParser {
-        vis:   Option<Visibility>,
-        ident: Ident,
-        meta:  Vec<Meta>,
+        vis:      Option<Visibility>,
+        ident:    Ident,
+        meta:     Vec<Meta>,
+        function: bool,
     }
 
     impl Parse for MyVariantsParser {
@@ -39,7 +40,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
 
             let _ = input.parse::<Token![const]>();
 
-            input.parse::<Token![fn]>()?;
+            let function = input.parse::<Token![fn]>().is_ok();
 
             let ident = input.parse::<Ident>()?;
 
@@ -71,6 +72,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                 vis,
                 ident,
                 meta,
+                function,
             })
         }
     }
@@ -439,14 +441,22 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                         vis,
                         ident,
                         meta,
+                        function,
                     }) = my_variants_parser
                     {
-                        Some(quote! {
-                            #(#[#meta])*
-                            #vis const fn #ident () -> [Self; #variant_count] {
-                                [#( Self::#variant_idents, )*]
-                            }
-                        })
+                        if function {
+                            Some(quote! {
+                                #(#[#meta])*
+                                #vis const fn #ident () -> [Self; #variant_count] {
+                                    [#( Self::#variant_idents, )*]
+                                }
+                            })
+                        } else {
+                            Some(quote! {
+                                #(#[#meta])*
+                                const #ident: [Self; #variant_count] = [#( Self::#variant_idents, )*];
+                            })
+                        }
                     } else {
                         None
                     };
