@@ -2,7 +2,7 @@
 # Enum Ordinalize Derive
 
 This library enables enums to not only obtain the ordinal values of their variants but also allows for the construction of enums from an ordinal value. See the [`enum-ordinalize`](https://crates.io/crates/enum-ordinalize) crate.
- */
+*/
 
 mod big_int_wrapper;
 mod panic;
@@ -516,6 +516,72 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
             }
         });
     }
+
+    expanded.into()
+}
+
+#[cfg(feature = "variants")]
+#[proc_macro_derive(Variants)]
+pub fn variants_derive(input: TokenStream) -> TokenStream {
+    struct MyDeriveInput {
+        ast:           DeriveInput,
+        variant_count: usize,
+        variants:      proc_macro2::TokenStream,
+    }
+
+    impl Parse for MyDeriveInput {
+        fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+            let ast = input.parse::<DeriveInput>()?;
+
+            match &ast.data {
+                Data::Enum(data) => {
+                    let variant_count = data.variants.len();
+
+                    let mut variant_idents: Vec<&Ident> = Vec::with_capacity(variant_count);
+
+                    for variant in data.variants.iter() {
+                        if let Fields::Unit = variant.fields {
+                            variant_idents.push(&variant.ident);
+                        } else {
+                            return Err(panic::not_unit_variant(variant.span()));
+                        }
+                    }
+
+                    let variants = quote! {
+                        const VARIANTS: [Self; #variant_count] = [#( Self::#variant_idents, )*];
+                    };
+
+                    Ok(MyDeriveInput {
+                        ast,
+                        variant_count,
+                        variants,
+                    })
+                },
+                _ => Err(panic::not_enum(ast.ident.span())),
+            }
+        }
+    }
+
+    // Parse the token stream
+    let derive_input = parse_macro_input!(input as MyDeriveInput);
+
+    let MyDeriveInput {
+        ast,
+        variant_count,
+        variants,
+    } = derive_input;
+
+    // Get the identifier of the type.
+    let name = &ast.ident;
+
+    let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
+
+    // Build the code
+    let expanded = quote! {
+        impl #impl_generics Variants<#variant_count> for #name #ty_generics #where_clause {
+            #variants
+        }
+    };
 
     expanded.into()
 }

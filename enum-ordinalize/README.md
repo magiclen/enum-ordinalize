@@ -54,6 +54,22 @@ assert_eq!([MyEnum::Zero, MyEnum::One, MyEnum::Two], MyEnum::get_variants());
 
 Note that `get_variants` is a constant associated function of `MyEnum`.
 
+If you prefer an associated constant, you can modify the code as follows:
+
+```rust
+use enum_ordinalize::Ordinalize;
+
+#[derive(Debug, PartialEq, Eq, Ordinalize)]
+#[ordinalize(variants(pub VARIANTS, doc = "The array of `MyEnum`'s variants."))]
+enum MyEnum {
+    Zero,
+    One,
+    Two,
+}
+
+assert_eq!([MyEnum::Zero, MyEnum::One, MyEnum::Two], MyEnum::VARIANTS);
+```
+
 #### The (Ordinal) Size of an Enum
 
 The ordinal value is an integer whose size is determined by the enum itself. The size of the enum increases with the magnitude of the variants' values, whether larger (or smaller if negative).
