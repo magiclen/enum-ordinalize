@@ -138,6 +138,45 @@ assert_eq!(MyEnum::Nine, unsafe { MyEnum::from_ordinal_unsafe(9i8) });
 assert_eq!(MyEnum::NegativeNine, unsafe { MyEnum::from_ordinal_unsafe(-9i8) });
 ```
 
+#### Implement Functionality for an enum on Itself
+
+For some reason, if you don't want to implement the `Ordinalize` trait for your enum, you can choose to disable the trait implementation and enable the constants/functions one by one. Functions are `const fn`. Names and visibility can also be defined by you.
+
+```rust
+use enum_ordinalize::Ordinalize;
+
+#[derive(Debug, PartialEq, Eq, Ordinalize)]
+#[ordinalize(impl_trait = false)]
+#[ordinalize(variant_count(pub const VARIANT_COUNT, doc = "The count of variants."))]
+#[ordinalize(variants(pub const VARIANTS, doc = "List of this enum's variants."))]
+#[ordinalize(values(pub const VALUES, doc = "List of values for all variants of this enum."))]
+#[ordinalize(ordinal(pub const fn ordinal, doc = "Retrieve the integer number of this variant."))]
+#[ordinalize(from_ordinal(pub const fn from_ordinal, doc = "Obtain a variant based on an integer number."))]
+#[ordinalize(from_ordinal_unsafe(
+    pub const fn from_ordinal_unsafe,
+    doc = "Obtain a variant based on an integer number.",
+    doc = "# Safety",
+    doc = "You have to ensure that the input integer number can correspond to a variant on your own.",
+))]
+enum MyEnum {
+    A,
+    B,
+}
+
+assert_eq!(2, MyEnum::VARIANT_COUNT);
+assert_eq!([MyEnum::A, MyEnum::B], MyEnum::VARIANTS);
+assert_eq!([0i8, 1i8], MyEnum::VALUES);
+
+assert_eq!(0i8, MyEnum::A.ordinal());
+assert_eq!(1i8, MyEnum::B.ordinal());
+
+assert_eq!(Some(MyEnum::A), MyEnum::from_ordinal(0i8));
+assert_eq!(Some(MyEnum::B), MyEnum::from_ordinal(1i8));
+
+assert_eq!(MyEnum::A, unsafe { MyEnum::from_ordinal_unsafe(0i8) });
+assert_eq!(MyEnum::B, unsafe { MyEnum::from_ordinal_unsafe(1i8) });
+```
+
 ## Crates.io
 
 https://crates.io/crates/enum-ordinalize
