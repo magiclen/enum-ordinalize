@@ -1,4 +1,4 @@
-#![cfg(all(feature = "derive", feature = "nightly-test"))]
+#![cfg(all(feature = "derive", feature = "traits", feature = "nightly-test"))]
 #![allow(incomplete_features)]
 #![feature(repr128)]
 

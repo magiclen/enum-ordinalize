@@ -39,6 +39,9 @@ jobs:
         features:
           -
           - --no-default-features
+          - --features traits
+          - --features derive
+          - --features traits --features derive
     name: Test ${{ matrix.toolchain }} on ${{ matrix.os }} (${{ matrix.features }})
     runs-on: ${{ matrix.os }}
     steps:
@@ -60,8 +63,6 @@ jobs:
         toolchain:
           - nightly
         features:
-          -
-          - --no-default-features
           - --features nightly-test
     name: Test ${{ matrix.toolchain }} on ${{ matrix.os }} (${{ matrix.features }})
     runs-on: ${{ matrix.os }}
@@ -86,6 +87,9 @@ jobs:
         features:
           -
           - --no-default-features
+          - --features traits
+          - --features derive
+          - --features traits --features derive
     name: Test ${{ matrix.toolchain }} on ${{ matrix.os }} (${{ matrix.features }})
     runs-on: ${{ matrix.os }}
     steps:

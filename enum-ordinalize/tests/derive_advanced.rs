@@ -1,4 +1,4 @@
-#![cfg(feature = "derive")]
+#![cfg(all(feature = "derive", feature = "traits"))]
 
 use enum_ordinalize::Ordinalize;
 

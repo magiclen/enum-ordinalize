@@ -1,11 +1,9 @@
-// deprecated usage
-
 #![cfg(feature = "derive")]
 
 use enum_ordinalize::Ordinalize;
 
 #[test]
-fn get_variants_const_fn_1() {
+fn variants_const_fn_1() {
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[ordinalize(variants(pub const fn v, doc = "Retrieve the array of `MyEnum`'s variants."))]
     enum MyEnum {
@@ -18,7 +16,7 @@ fn get_variants_const_fn_1() {
 }
 
 #[test]
-fn get_variants_const_fn_2() {
+fn variants_const_fn_2() {
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[ordinalize(variants(pub fn v, doc = "Retrieve the array of `MyEnum`'s variants."))]
     enum MyEnum {
@@ -31,7 +29,7 @@ fn get_variants_const_fn_2() {
 }
 
 #[test]
-fn get_variants_const_1() {
+fn variants_const_1() {
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[ordinalize(variants(pub const V, doc = "The array of `MyEnum`'s variants."))]
     enum MyEnum {
@@ -44,7 +42,7 @@ fn get_variants_const_1() {
 }
 
 #[test]
-fn get_variants_const_2() {
+fn variants_const_2() {
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[ordinalize(variants(pub V, doc = "The array of `MyEnum`'s variants."))]
     enum MyEnum {

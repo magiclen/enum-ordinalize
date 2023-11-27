@@ -3,6 +3,7 @@
 /// ```rust
 /// use enum_ordinalize::Ordinalize;
 ///
+/// #[repr(u8)]
 /// enum E {
 ///     A,
 ///     B,

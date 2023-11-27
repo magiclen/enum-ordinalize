@@ -4,26 +4,26 @@ use proc_macro2::{Literal, TokenStream};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::Expr;
 
-pub(crate) enum BigIntWrapper<'a> {
+pub(crate) enum BigIntWrapper {
     Integer(BigInt),
-    Constant(&'a Expr, usize),
+    Constant(Expr, usize),
 }
 
-impl<'a> From<BigInt> for BigIntWrapper<'a> {
+impl From<BigInt> for BigIntWrapper {
     #[inline]
-    fn from(v: BigInt) -> BigIntWrapper<'a> {
+    fn from(v: BigInt) -> BigIntWrapper {
         BigIntWrapper::Integer(v)
     }
 }
 
-impl<'a> From<(&'a Expr, usize)> for BigIntWrapper<'a> {
+impl From<(&Expr, usize)> for BigIntWrapper {
     #[inline]
-    fn from((expr, counter): (&'a Expr, usize)) -> BigIntWrapper<'a> {
-        BigIntWrapper::Constant(expr, counter)
+    fn from((expr, counter): (&Expr, usize)) -> BigIntWrapper {
+        BigIntWrapper::Constant(expr.clone(), counter)
     }
 }
 
-impl<'a> ToTokens for BigIntWrapper<'a> {
+impl ToTokens for BigIntWrapper {
     #[inline]
     fn to_tokens(&self, tokens: &mut TokenStream) {
         match self {

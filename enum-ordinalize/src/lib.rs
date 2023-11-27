@@ -152,8 +152,10 @@ assert_eq!(MyEnum::NegativeNine, unsafe { MyEnum::from_ordinal_unsafe(-9i8) });
 #![no_std]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
+#[cfg(feature = "traits")]
 mod traits;
 
 #[cfg(feature = "derive")]
 pub use enum_ordinalize_derive::Ordinalize;
+#[cfg(feature = "traits")]
 pub use traits::Ordinalize;
