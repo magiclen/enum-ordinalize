@@ -35,7 +35,7 @@ pub fn constant_variable_on_non_determined_size_enum(span: Span) -> syn::Error {
 
 #[inline]
 pub fn list_attribute_usage(name: &Ident, span: Span) -> syn::Error {
-    syn::Error::new(span, format!("the \"{name}\" attribute should be a list", name = name))
+    syn::Error::new(span, format!("the `{name}` attribute should be a list", name = name))
     // use `name = name` to support Rust 1.56
 }
 
@@ -44,7 +44,7 @@ pub fn bool_attribute_usage(name: &Ident, span: Span) -> syn::Error {
     syn::Error::new(
         span,
         format!(
-            "the \"{name}\" attribute should be a name-value pair. The value type is boolean",
+            "the `{name}` attribute should be a name-value pair. The value type is boolean",
             name = name
         ),
     )
