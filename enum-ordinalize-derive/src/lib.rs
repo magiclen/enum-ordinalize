@@ -35,7 +35,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
 
     impl Parse for ConstMember {
         #[inline]
-        fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        fn parse(input: ParseStream) -> syn::Result<Self> {
             let vis = input.parse::<Visibility>().ok();
 
             let _ = input.parse::<Token![const]>();
@@ -85,7 +85,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
 
     impl Parse for ConstFunctionMember {
         #[inline]
-        fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        fn parse(input: ParseStream) -> syn::Result<Self> {
             let vis = input.parse::<Visibility>().ok();
 
             let _ = input.parse::<Token![const]>();
@@ -142,7 +142,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
     }
 
     impl Parse for MyDeriveInput {
-        fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        fn parse(input: ParseStream) -> syn::Result<Self> {
             let ast = input.parse::<DeriveInput>()?;
 
             let mut variant_type = VariantType::default();

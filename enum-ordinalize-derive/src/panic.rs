@@ -55,7 +55,7 @@ pub fn bool_attribute_usage(name: &Ident, span: Span) -> syn::Error {
 pub fn sub_attributes_for_ordinalize(span: Span) -> syn::Error {
     syn::Error::new(
         span,
-        format!("Available sub-attributes for the `ordinalize` attribute:\n{:#?}", [
+        format!("available sub-attributes for the `ordinalize` attribute:\n{:#?}", [
             "impl_trait",
             "variant_count",
             "variants",
