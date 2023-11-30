@@ -1,5 +1,20 @@
+use core::fmt::{self, Display, Formatter};
+
 use proc_macro2::Span;
 use syn::Ident;
+
+struct DisplayStringSlice<'a>(&'a [&'static str]);
+
+impl<'a> Display for DisplayStringSlice<'a> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        for &s in self.0 {
+            f.write_str("\n    ")?;
+            f.write_str(s)?;
+        }
+
+        Ok(())
+    }
+}
 
 #[inline]
 pub fn not_enum(span: Span) -> syn::Error {
@@ -55,14 +70,17 @@ pub fn bool_attribute_usage(name: &Ident, span: Span) -> syn::Error {
 pub fn sub_attributes_for_ordinalize(span: Span) -> syn::Error {
     syn::Error::new(
         span,
-        format!("available sub-attributes for the `ordinalize` attribute:\n{:#?}", [
-            "impl_trait",
-            "variant_count",
-            "variants",
-            "values",
-            "ordinal",
-            "from_ordinal_unsafe",
-            "from_ordinal",
-        ]),
+        format!(
+            "available sub-attributes for the `ordinalize` attribute:{}",
+            DisplayStringSlice(&[
+                "impl_trait",
+                "variant_count",
+                "variants",
+                "values",
+                "ordinal",
+                "from_ordinal_unsafe",
+                "from_ordinal",
+            ])
+        ),
     )
 }
