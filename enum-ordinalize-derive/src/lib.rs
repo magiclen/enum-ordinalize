@@ -645,7 +645,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
         } else {
             quote! {
                 #(#[#meta])*
-                const #ident: usize = #variant_count;
+                #vis const #ident: usize = #variant_count;
             }
         });
     }
@@ -667,7 +667,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
         } else {
             quote! {
                 #(#[#meta])*
-                const #ident: [Self; #variant_count] = [#( Self::#variant_idents, )*];
+                #vis const #ident: [Self; #variant_count] = [#( Self::#variant_idents, )*];
             }
         });
     }
@@ -689,7 +689,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
         } else {
             quote! {
                 #(#[#meta])*
-                const #ident: [#variant_type; #variant_count] = [#( #values, )*];
+                #vis const #ident: [#variant_type; #variant_count] = [#( #values, )*];
             }
         });
     }
