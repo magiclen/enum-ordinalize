@@ -4,13 +4,18 @@
 This library enables enums to not only obtain the ordinal values of their variants but also allows for the construction of enums from an ordinal value. See the [`enum-ordinalize`](https://crates.io/crates/enum-ordinalize) crate.
 */
 
-mod big_int_wrapper;
+#![no_std]
+
+#[macro_use]
+extern crate alloc;
+
+mod int128;
+mod int_wrapper;
 mod panic;
 mod variant_type;
 
-use std::str::FromStr;
+use alloc::{string::ToString, vec::Vec};
 
-use num_bigint::BigInt;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
@@ -22,7 +27,7 @@ use syn::{
 };
 use variant_type::VariantType;
 
-use crate::big_int_wrapper::BigIntWrapper;
+use crate::{int128::Int128, int_wrapper::IntWrapper};
 
 #[proc_macro_derive(Ordinalize, attributes(ordinalize))]
 pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
@@ -129,7 +134,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
     struct MyDeriveInput {
         ast:                        DeriveInput,
         variant_type:               VariantType,
-        values:                     Vec<BigIntWrapper>,
+        values:                     Vec<IntWrapper>,
         variant_idents:             Vec<Ident>,
         use_constant_counter:       bool,
         enable_trait:               bool,
@@ -284,27 +289,23 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                     return Err(panic::no_variant(name.span()));
                 }
 
-                let mut values: Vec<BigIntWrapper> = Vec::with_capacity(variant_count);
+                let mut values: Vec<IntWrapper> = Vec::with_capacity(variant_count);
                 let mut variant_idents: Vec<Ident> = Vec::with_capacity(variant_count);
 
                 let mut use_constant_counter = false;
 
                 if let VariantType::NonDetermined = variant_type {
-                    let mut min = BigInt::from(u128::MAX);
-                    let mut max = BigInt::from(i128::MIN);
-                    let mut counter = BigInt::default();
+                    let mut min = Int128::MAX;
+                    let mut max = Int128::MIN;
+                    let mut counter = Int128::ZERO;
 
                     for variant in data.variants.iter() {
                         if let Fields::Unit = variant.fields {
-                            let value = if let Some((_, exp)) = variant.discriminant.as_ref() {
+                            if let Some((_, exp)) = variant.discriminant.as_ref() {
                                 match exp {
                                     Expr::Lit(lit) => {
                                         if let Lit::Int(value) = &lit.lit {
-                                            let value = value.base10_digits();
-
-                                            counter = BigInt::from_str(value).unwrap();
-
-                                            counter.clone()
+                                            counter = value.base10_parse().unwrap();
                                         } else {
                                             return Err(panic::unsupported_discriminant(
                                                 lit.span(),
@@ -316,11 +317,8 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                             match unary.expr.as_ref() {
                                             Expr::Lit(lit) => {
                                                 if let Lit::Int(value) = &lit.lit {
-                                                    let value = value.base10_digits();
-
-                                                    counter = -BigInt::from_str(value).unwrap();
-
-                                                    counter.clone()
+                                                    counter = -value
+                                                        .base10_parse::<Int128>().unwrap();
                                                 } else {
                                                     return Err(panic::unsupported_discriminant(lit.span()));
                                                 }
@@ -351,43 +349,41 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                     },
                                     _ => return Err(panic::unsupported_discriminant(exp.span())),
                                 }
-                            } else {
-                                counter.clone()
                             };
 
-                            if min > value {
-                                min = value.clone();
+                            if min > counter {
+                                min = counter;
                             }
 
-                            if max < value {
-                                max = value.clone();
+                            if max < counter {
+                                max = counter;
                             }
 
                             variant_idents.push(variant.ident.clone());
 
-                            counter += 1;
+                            values.push(IntWrapper::from(counter));
 
-                            values.push(BigIntWrapper::from(value));
+                            counter.inc();
                         } else {
                             return Err(panic::not_unit_variant(variant.span()));
                         }
                     }
 
-                    if min >= BigInt::from(i8::MIN) && max <= BigInt::from(i8::MAX) {
+                    if min >= Int128::from(i8::MIN) && max <= Int128::from(i8::MAX) {
                         variant_type = VariantType::I8;
-                    } else if min >= BigInt::from(i16::MIN) && max <= BigInt::from(i16::MAX) {
+                    } else if min >= Int128::from(i16::MIN) && max <= Int128::from(i16::MAX) {
                         variant_type = VariantType::I16;
-                    } else if min >= BigInt::from(i32::MIN) && max <= BigInt::from(i32::MAX) {
+                    } else if min >= Int128::from(i32::MIN) && max <= Int128::from(i32::MAX) {
                         variant_type = VariantType::I32;
-                    } else if min >= BigInt::from(i64::MIN) && max <= BigInt::from(i64::MAX) {
+                    } else if min >= Int128::from(i64::MIN) && max <= Int128::from(i64::MAX) {
                         variant_type = VariantType::I64;
-                    } else if min >= BigInt::from(i128::MIN) && max <= BigInt::from(i128::MAX) {
+                    } else if min >= Int128::from(i128::MIN) && max <= Int128::from(i128::MAX) {
                         variant_type = VariantType::I128;
                     } else {
                         return Err(panic::unsupported_discriminant(name.span()));
                     }
                 } else {
-                    let mut counter = BigInt::default();
+                    let mut counter = Int128::ZERO;
                     let mut constant_counter = 0;
                     let mut last_exp: Option<&Expr> = None;
 
@@ -397,13 +393,11 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                 match exp {
                                     Expr::Lit(lit) => {
                                         if let Lit::Int(value) = &lit.lit {
-                                            let value = value.base10_digits();
+                                            counter = value.base10_parse().unwrap();
 
-                                            counter = BigInt::from_str(value).unwrap();
+                                            values.push(IntWrapper::from(counter));
 
-                                            values.push(BigIntWrapper::from(counter.clone()));
-
-                                            counter += 1;
+                                            counter.inc();
 
                                             last_exp = None;
                                         } else {
@@ -420,16 +414,13 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
 
                                                     match lit {
                                                         Lit::Int(value) => {
-                                                            let value = value.base10_digits();
+                                                            counter = -value
+                                                                .base10_parse::<Int128>()
+                                                                .unwrap();
 
-                                                            counter =
-                                                                -BigInt::from_str(value).unwrap();
+                                                            values.push(IntWrapper::from(counter));
 
-                                                            values.push(BigIntWrapper::from(
-                                                                counter.clone(),
-                                                            ));
-
-                                                            counter += 1;
+                                                            counter.inc();
 
                                                             last_exp = None;
                                                         },
@@ -443,13 +434,13 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                     }
                                                 },
                                                 Expr::Path(_) => {
-                                                    values.push(BigIntWrapper::from((exp, 0)));
+                                                    values.push(IntWrapper::from((exp, 0)));
 
                                                     last_exp = Some(exp);
                                                     constant_counter = 1;
                                                 },
                                                 Expr::Cast(_) | Expr::Binary(_) | Expr::Call(_) => {
-                                                    values.push(BigIntWrapper::from((exp, 0)));
+                                                    values.push(IntWrapper::from((exp, 0)));
 
                                                     last_exp = Some(exp);
                                                     constant_counter = 1;
@@ -469,13 +460,13 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                         }
                                     },
                                     Expr::Path(_) => {
-                                        values.push(BigIntWrapper::from((exp, 0)));
+                                        values.push(IntWrapper::from((exp, 0)));
 
                                         last_exp = Some(exp);
                                         constant_counter = 1;
                                     },
                                     Expr::Cast(_) | Expr::Binary(_) | Expr::Call(_) => {
-                                        values.push(BigIntWrapper::from((exp, 0)));
+                                        values.push(IntWrapper::from((exp, 0)));
 
                                         last_exp = Some(exp);
                                         constant_counter = 1;
@@ -485,15 +476,15 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                     _ => return Err(panic::unsupported_discriminant(exp.span())),
                                 }
                             } else if let Some(exp) = last_exp {
-                                values.push(BigIntWrapper::from((exp, constant_counter)));
+                                values.push(IntWrapper::from((exp, constant_counter)));
 
                                 constant_counter += 1;
 
                                 use_constant_counter = true;
                             } else {
-                                values.push(BigIntWrapper::from(counter.clone()));
+                                values.push(IntWrapper::from(counter));
 
-                                counter += 1;
+                                counter.inc();
                             }
 
                             variant_idents.push(variant.ident.clone());
