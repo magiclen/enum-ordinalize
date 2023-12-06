@@ -158,34 +158,52 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                 let path = attr.path();
 
                 if let Some(ident) = path.get_ident() {
-                    if ident == "repr" {
-                        // #[repr(u8)], #[repr(u16)], ..., etc.
-                        if let Meta::List(list) = &attr.meta {
-                            let result = list.parse_args_with(
-                                Punctuated::<Ident, Token![,]>::parse_terminated,
-                            )?;
+                    match ident.to_string().as_str() {
+                        "repr" => {
+                            // #[repr(u8)], #[repr(u16)], ..., etc.
+                            if let Meta::List(list) = &attr.meta {
+                                let result = list.parse_args_with(
+                                    Punctuated::<Ident, Token![,]>::parse_terminated,
+                                )?;
 
-                            if let Some(value) = result.into_iter().next() {
-                                variant_type = VariantType::from_str(value.to_string());
+                                if let Some(value) = result.into_iter().next() {
+                                    variant_type = VariantType::from_str(value.to_string());
+                                }
                             }
-                        }
 
-                        break;
-                    } else if ident == "ordinalize" {
-                        if let Meta::List(list) = &attr.meta {
-                            let result = list
-                                .parse_args_with(Punctuated::<Meta, Token![,]>::parse_terminated)?;
+                            break;
+                        },
+                        "ordinalize" => {
+                            if let Meta::List(list) = &attr.meta {
+                                let result = list.parse_args_with(
+                                    Punctuated::<Meta, Token![,]>::parse_terminated,
+                                )?;
 
-                            for meta in result {
-                                let path = meta.path();
+                                for meta in result {
+                                    let path = meta.path();
 
-                                if let Some(ident) = path.get_ident() {
-                                    if ident == "impl_trait" {
-                                        if let Meta::NameValue(meta) = &meta {
-                                            if let Expr::Lit(lit) = &meta.value {
-                                                if let Lit::Bool(value) = &lit.lit {
-                                                    if cfg!(feature = "traits") {
-                                                        enable_trait = value.value;
+                                    if let Some(ident) = path.get_ident() {
+                                        match ident.to_string().as_str() {
+                                            "impl_trait" => {
+                                                if let Meta::NameValue(meta) = &meta {
+                                                    if let Expr::Lit(lit) = &meta.value {
+                                                        if let Lit::Bool(value) = &lit.lit {
+                                                            if cfg!(feature = "traits") {
+                                                                enable_trait = value.value;
+                                                            }
+                                                        } else {
+                                                            return Err(
+                                                                panic::bool_attribute_usage(
+                                                                    ident,
+                                                                    ident.span(),
+                                                                ),
+                                                            );
+                                                        }
+                                                    } else {
+                                                        return Err(panic::bool_attribute_usage(
+                                                            ident,
+                                                            ident.span(),
+                                                        ));
                                                     }
                                                 } else {
                                                     return Err(panic::bool_attribute_usage(
@@ -193,84 +211,86 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                         ident.span(),
                                                     ));
                                                 }
-                                            } else {
-                                                return Err(panic::bool_attribute_usage(
-                                                    ident,
+                                            },
+                                            "variant_count" => {
+                                                if let Meta::List(list) = &meta {
+                                                    enable_variant_count = Some(list.parse_args()?);
+                                                } else {
+                                                    return Err(panic::list_attribute_usage(
+                                                        ident,
+                                                        ident.span(),
+                                                    ));
+                                                }
+                                            },
+                                            "variants" => {
+                                                if let Meta::List(list) = &meta {
+                                                    enable_variants = Some(list.parse_args()?);
+                                                } else {
+                                                    return Err(panic::list_attribute_usage(
+                                                        ident,
+                                                        ident.span(),
+                                                    ));
+                                                }
+                                            },
+                                            "values" => {
+                                                if let Meta::List(list) = &meta {
+                                                    enable_values = Some(list.parse_args()?);
+                                                } else {
+                                                    return Err(panic::list_attribute_usage(
+                                                        ident,
+                                                        ident.span(),
+                                                    ));
+                                                }
+                                            },
+                                            "from_ordinal_unsafe" => {
+                                                if let Meta::List(list) = &meta {
+                                                    enable_from_ordinal_unsafe =
+                                                        Some(list.parse_args()?);
+                                                } else {
+                                                    return Err(panic::list_attribute_usage(
+                                                        ident,
+                                                        ident.span(),
+                                                    ));
+                                                }
+                                            },
+                                            "from_ordinal" => {
+                                                if let Meta::List(list) = &meta {
+                                                    enable_from_ordinal = Some(list.parse_args()?);
+                                                } else {
+                                                    return Err(panic::list_attribute_usage(
+                                                        ident,
+                                                        ident.span(),
+                                                    ));
+                                                }
+                                            },
+                                            "ordinal" => {
+                                                if let Meta::List(list) = &meta {
+                                                    enable_ordinal = Some(list.parse_args()?);
+                                                } else {
+                                                    return Err(panic::list_attribute_usage(
+                                                        ident,
+                                                        ident.span(),
+                                                    ));
+                                                }
+                                            },
+                                            _ => {
+                                                return Err(panic::sub_attributes_for_ordinalize(
                                                     ident.span(),
                                                 ));
-                                            }
-                                        } else {
-                                            return Err(panic::bool_attribute_usage(
-                                                ident,
-                                                ident.span(),
-                                            ));
-                                        }
-                                    } else if ident == "variant_count" {
-                                        if let Meta::List(list) = &meta {
-                                            enable_variant_count = Some(list.parse_args()?);
-                                        } else {
-                                            return Err(panic::list_attribute_usage(
-                                                ident,
-                                                ident.span(),
-                                            ));
-                                        }
-                                    } else if ident == "variants" {
-                                        if let Meta::List(list) = &meta {
-                                            enable_variants = Some(list.parse_args()?);
-                                        } else {
-                                            return Err(panic::list_attribute_usage(
-                                                ident,
-                                                ident.span(),
-                                            ));
-                                        }
-                                    } else if ident == "values" {
-                                        if let Meta::List(list) = &meta {
-                                            enable_values = Some(list.parse_args()?);
-                                        } else {
-                                            return Err(panic::list_attribute_usage(
-                                                ident,
-                                                ident.span(),
-                                            ));
-                                        }
-                                    } else if ident == "from_ordinal_unsafe" {
-                                        if let Meta::List(list) = &meta {
-                                            enable_from_ordinal_unsafe = Some(list.parse_args()?);
-                                        } else {
-                                            return Err(panic::list_attribute_usage(
-                                                ident,
-                                                ident.span(),
-                                            ));
-                                        }
-                                    } else if ident == "from_ordinal" {
-                                        if let Meta::List(list) = &meta {
-                                            enable_from_ordinal = Some(list.parse_args()?);
-                                        } else {
-                                            return Err(panic::list_attribute_usage(
-                                                ident,
-                                                ident.span(),
-                                            ));
-                                        }
-                                    } else if ident == "ordinal" {
-                                        if let Meta::List(list) = &meta {
-                                            enable_ordinal = Some(list.parse_args()?);
-                                        } else {
-                                            return Err(panic::list_attribute_usage(
-                                                ident,
-                                                ident.span(),
-                                            ));
+                                            },
                                         }
                                     } else {
-                                        return Err(panic::sub_attributes_for_ordinalize(
+                                        return Err(panic::list_attribute_usage(
+                                            ident,
                                             ident.span(),
                                         ));
                                     }
-                                } else {
-                                    return Err(panic::list_attribute_usage(ident, ident.span()));
                                 }
+                            } else {
+                                return Err(panic::list_attribute_usage(ident, ident.span()));
                             }
-                        } else {
-                            return Err(panic::list_attribute_usage(ident, ident.span()));
-                        }
+                        },
+                        _ => (),
                     }
                 }
             }
