@@ -17,22 +17,22 @@ impl<'a> Display for DisplayStringSlice<'a> {
 }
 
 #[inline]
-pub fn not_enum(span: Span) -> syn::Error {
+pub(crate) fn not_enum(span: Span) -> syn::Error {
     syn::Error::new(span, "only enums can be ordinalized")
 }
 
 #[inline]
-pub fn no_variant(span: Span) -> syn::Error {
+pub(crate) fn no_variant(span: Span) -> syn::Error {
     syn::Error::new(span, "an ordinalized enum needs to have at least one variant")
 }
 
 #[inline]
-pub fn not_unit_variant(span: Span) -> syn::Error {
+pub(crate) fn not_unit_variant(span: Span) -> syn::Error {
     syn::Error::new(span, "an ordinalized enum can only have unit variants")
 }
 
 #[inline]
-pub fn unsupported_discriminant(span: Span) -> syn::Error {
+pub(crate) fn unsupported_discriminant(span: Span) -> syn::Error {
     syn::Error::new(
         span,
         "the discriminant of a variant of an ordinalized enum needs to be a legal literal \
@@ -40,7 +40,7 @@ pub fn unsupported_discriminant(span: Span) -> syn::Error {
     )
 }
 #[inline]
-pub fn constant_variable_on_non_determined_size_enum(span: Span) -> syn::Error {
+pub(crate) fn constant_variable_on_non_determined_size_enum(span: Span) -> syn::Error {
     syn::Error::new(
         span,
         "the discriminant of a variant can be assigned not to a literal integer only when the \
@@ -55,7 +55,7 @@ pub fn list_attribute_usage(name: &Ident, span: Span) -> syn::Error {
 }
 
 #[inline]
-pub fn bool_attribute_usage(name: &Ident, span: Span) -> syn::Error {
+pub(crate) fn bool_attribute_usage(name: &Ident, span: Span) -> syn::Error {
     syn::Error::new(
         span,
         format!(
@@ -67,7 +67,7 @@ pub fn bool_attribute_usage(name: &Ident, span: Span) -> syn::Error {
 }
 
 #[inline]
-pub fn sub_attributes_for_ordinalize(span: Span) -> syn::Error {
+pub(crate) fn sub_attributes_for_ordinalize(span: Span) -> syn::Error {
     syn::Error::new(
         span,
         format!(

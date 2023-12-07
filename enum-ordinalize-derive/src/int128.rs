@@ -7,7 +7,7 @@ use core::{
 };
 
 #[derive(Debug, Copy, Eq, Clone)]
-pub enum Int128 {
+pub(crate) enum Int128 {
     Signed(i128),
     Unsigned(u128),
 }
@@ -93,9 +93,9 @@ impl Default for Int128 {
 }
 
 impl Int128 {
-    pub const MAX: Self = Self::Unsigned(u128::MAX);
-    pub const MIN: Self = Self::Signed(i128::MIN);
-    pub const ZERO: Self = Self::Unsigned(0);
+    pub(crate) const MAX: Self = Self::Unsigned(u128::MAX);
+    pub(crate) const MIN: Self = Self::Signed(i128::MIN);
+    pub(crate) const ZERO: Self = Self::Unsigned(0);
 }
 
 macro_rules! impl_from_signed {
@@ -152,7 +152,7 @@ impl Neg for Int128 {
 
 impl Int128 {
     #[inline]
-    pub fn inc(&mut self) {
+    pub(crate) fn inc(&mut self) {
         match self {
             Self::Signed(i) => {
                 if *i == i128::MAX {
