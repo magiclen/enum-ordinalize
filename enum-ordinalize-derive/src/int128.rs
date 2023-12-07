@@ -93,8 +93,6 @@ impl Default for Int128 {
 }
 
 impl Int128 {
-    pub(crate) const MAX: Self = Self::Unsigned(u128::MAX);
-    pub(crate) const MIN: Self = Self::Signed(i128::MIN);
     pub(crate) const ZERO: Self = Self::Unsigned(0);
 }
 

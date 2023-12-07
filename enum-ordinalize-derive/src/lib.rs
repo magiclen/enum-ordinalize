@@ -315,17 +315,19 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                 let mut use_constant_counter = false;
 
                 if let VariantType::NonDetermined = variant_type {
-                    let mut min = Int128::MAX;
-                    let mut max = Int128::MIN;
-                    let mut counter = Int128::ZERO;
+                    let mut min = i128::MAX;
+                    let mut max = i128::MIN;
+                    let mut counter = 0;
 
                     for variant in data.variants.iter() {
                         if let Fields::Unit = variant.fields {
                             if let Some((_, exp)) = variant.discriminant.as_ref() {
                                 match exp {
                                     Expr::Lit(lit) => {
-                                        if let Lit::Int(value) = &lit.lit {
-                                            counter = value.base10_parse().unwrap();
+                                        if let Lit::Int(lit) = &lit.lit {
+                                            counter = lit.base10_parse().map_err(|error| {
+                                                syn::Error::new(lit.span(), error)
+                                            })?;
                                         } else {
                                             return Err(panic::unsupported_discriminant(
                                                 lit.span(),
@@ -336,9 +338,20 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                         if let UnOp::Neg(_) = unary.op {
                                             match unary.expr.as_ref() {
                                             Expr::Lit(lit) => {
-                                                if let Lit::Int(value) = &lit.lit {
-                                                    counter = -value
-                                                        .base10_parse::<Int128>().unwrap();
+                                                if let Lit::Int(lit) = &lit.lit {
+                                                    match lit.base10_parse::<i128>() {
+                                                        Ok(i) => {
+                                                            counter = -i;
+                                                        },
+                                                        Err(error) => {
+                                                            // overflow
+                                                            if lit.base10_digits() == "170141183460469231731687303715884105728" {
+                                                                counter = i128::MIN;
+                                                            } else {
+                                                                return Err(syn::Error::new(lit.span(), error));
+                                                            }
+                                                        },
+                                                    }
                                                 } else {
                                                     return Err(panic::unsupported_discriminant(lit.span()));
                                                 }
@@ -383,24 +396,22 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
 
                             values.push(IntWrapper::from(counter));
 
-                            counter.inc();
+                            counter = counter.saturating_add(1);
                         } else {
                             return Err(panic::not_unit_variant(variant.span()));
                         }
                     }
 
-                    if min >= Int128::from(i8::MIN) && max <= Int128::from(i8::MAX) {
+                    if min >= i8::MIN as i128 && max <= i8::MAX as i128 {
                         variant_type = VariantType::I8;
-                    } else if min >= Int128::from(i16::MIN) && max <= Int128::from(i16::MAX) {
+                    } else if min >= i16::MIN as i128 && max <= i16::MAX as i128 {
                         variant_type = VariantType::I16;
-                    } else if min >= Int128::from(i32::MIN) && max <= Int128::from(i32::MAX) {
+                    } else if min >= i32::MIN as i128 && max <= i32::MAX as i128 {
                         variant_type = VariantType::I32;
-                    } else if min >= Int128::from(i64::MIN) && max <= Int128::from(i64::MAX) {
+                    } else if min >= i64::MIN as i128 && max <= i64::MAX as i128 {
                         variant_type = VariantType::I64;
-                    } else if min >= Int128::from(i128::MIN) && max <= Int128::from(i128::MAX) {
-                        variant_type = VariantType::I128;
                     } else {
-                        return Err(panic::unsupported_discriminant(name.span()));
+                        variant_type = VariantType::I128;
                     }
                 } else {
                     let mut counter = Int128::ZERO;
@@ -412,8 +423,10 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                             if let Some((_, exp)) = variant.discriminant.as_ref() {
                                 match exp {
                                     Expr::Lit(lit) => {
-                                        if let Lit::Int(value) = &lit.lit {
-                                            counter = value.base10_parse().unwrap();
+                                        if let Lit::Int(lit) = &lit.lit {
+                                            counter = lit.base10_parse().map_err(|error| {
+                                                syn::Error::new(lit.span(), error)
+                                            })?;
 
                                             values.push(IntWrapper::from(counter));
 
@@ -430,27 +443,24 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                         if let UnOp::Neg(_) = unary.op {
                                             match unary.expr.as_ref() {
                                                 Expr::Lit(lit) => {
-                                                    let lit = &lit.lit;
+                                                    if let Lit::Int(lit) = &lit.lit {
+                                                        counter = -lit.base10_parse().map_err(
+                                                            |error| {
+                                                                syn::Error::new(lit.span(), error)
+                                                            },
+                                                        )?;
 
-                                                    match lit {
-                                                        Lit::Int(value) => {
-                                                            counter = -value
-                                                                .base10_parse::<Int128>()
-                                                                .unwrap();
+                                                        values.push(IntWrapper::from(counter));
 
-                                                            values.push(IntWrapper::from(counter));
+                                                        counter.inc();
 
-                                                            counter.inc();
-
-                                                            last_exp = None;
-                                                        },
-                                                        _ => {
-                                                            return Err(
-                                                                panic::unsupported_discriminant(
-                                                                    lit.span(),
-                                                                ),
-                                                            );
-                                                        },
+                                                        last_exp = None;
+                                                    } else {
+                                                        return Err(
+                                                            panic::unsupported_discriminant(
+                                                                lit.span(),
+                                                            ),
+                                                        );
                                                     }
                                                 },
                                                 Expr::Path(_) => {

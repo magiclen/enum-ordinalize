@@ -16,6 +16,13 @@ impl From<Int128> for IntWrapper {
     }
 }
 
+impl From<i128> for IntWrapper {
+    #[inline]
+    fn from(v: i128) -> IntWrapper {
+        Self::Integer(Int128::from(v))
+    }
+}
+
 impl From<(&Expr, usize)> for IntWrapper {
     #[inline]
     fn from((expr, counter): (&Expr, usize)) -> IntWrapper {
