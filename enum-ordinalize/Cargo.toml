@@ -1,6 +1,6 @@
 [package]
 name = "enum-ordinalize"
-version = "4.2.1"
+version = "4.2.2"
 edition = "2021"
 rust-version = "1.56"
 repository = "https://github.com/magiclen/enum-ordinalize"
@@ -18,7 +18,7 @@ enum-ordinalize-derive = { version = "4.2.6", path = "../enum-ordinalize-derive"
 default = ["derive", "traits"]
 
 derive = ["enum-ordinalize-derive"]
-traits = ["enum-ordinalize-derive/traits"]
+traits = ["enum-ordinalize-derive?/traits"]
 
 nightly-test = []
 
