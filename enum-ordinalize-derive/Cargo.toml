@@ -1,8 +1,8 @@
 [package]
 name = "enum-ordinalize-derive"
-version = "4.2.9"
+version = "4.3.0"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.60"
 repository = "https://github.com/magiclen/enum-ordinalize"
 homepage = "https://magiclen.org/enum-ordinalize"
 keywords = ["enum", "ordinal", "ordinalize", "number"]
