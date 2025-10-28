@@ -1,6 +1,6 @@
 #![cfg(all(feature = "derive", feature = "traits", feature = "nightly-test"))]
 #![allow(incomplete_features)]
-#![feature(repr128)]
+#![allow(stable_features)]
 
 use enum_ordinalize::Ordinalize;
 

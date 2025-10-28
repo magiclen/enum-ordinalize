@@ -192,7 +192,7 @@ assert_eq!(MyEnum::B, unsafe { MyEnum::from_ordinal_unsafe(1i8) });
 */
 
 #![no_std]
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 #[cfg(feature = "traits")]
 mod traits;
