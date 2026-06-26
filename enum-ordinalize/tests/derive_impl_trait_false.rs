@@ -23,7 +23,7 @@ fn create_ordinalized_enum_1_3() {
 
         #[inline]
         unsafe fn from_ordinal_unsafe(number: Self::VariantType) -> Self {
-            ::core::mem::transmute(number)
+            unsafe { ::core::mem::transmute(number) }
         }
 
         #[inline]

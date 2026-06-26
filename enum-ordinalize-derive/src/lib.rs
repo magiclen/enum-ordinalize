@@ -19,15 +19,15 @@ use alloc::{string::ToString, vec::Vec};
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
+    Data, DeriveInput, Expr, Fields, Ident, Lit, Meta, Token, UnOp, Visibility,
     parse::{Parse, ParseStream},
     parse_macro_input,
     punctuated::Punctuated,
     spanned::Spanned,
-    Data, DeriveInput, Expr, Fields, Ident, Lit, Meta, Token, UnOp, Visibility,
 };
 use variant_type::VariantType;
 
-use crate::{int128::Int128, int_wrapper::IntWrapper};
+use crate::{int_wrapper::IntWrapper, int128::Int128};
 
 #[proc_macro_derive(Ordinalize, attributes(ordinalize))]
 pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
@@ -378,7 +378,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                             panic::constant_variable_on_non_determined_size_enum(
                                                 exp.span(),
                                             ),
-                                        )
+                                        );
                                     },
                                     _ => return Err(panic::unsupported_discriminant(exp.span())),
                                 }

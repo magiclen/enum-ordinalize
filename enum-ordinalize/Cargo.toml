@@ -1,8 +1,8 @@
 [package]
 name = "enum-ordinalize"
-version = "4.3.2"
-edition = "2021"
-rust-version = "1.68"
+version = "4.4.0"
+edition = "2024"
+rust-version = "1.89"
 repository = "https://github.com/magiclen/enum-ordinalize"
 homepage = "https://magiclen.org/enum-ordinalize"
 keywords = ["enum", "ordinal", "ordinalize", "number"]
@@ -12,15 +12,13 @@ license = "MIT"
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
 [dependencies]
-enum-ordinalize-derive = { version = "4.3", path = "../enum-ordinalize-derive", default-features = false, optional = true }
+enum-ordinalize-derive = { version = "4.4", path = "../enum-ordinalize-derive", default-features = false, optional = true }
 
 [features]
 default = ["derive", "traits"]
 
 derive = ["dep:enum-ordinalize-derive"]
 traits = ["enum-ordinalize-derive?/traits"]
-
-nightly-test = []
 
 [package.metadata.docs.rs]
 all-features = true

@@ -1,7 +1,3 @@
-#![cfg(all(feature = "derive", feature = "traits", feature = "nightly-test"))]
-#![allow(incomplete_features)]
-#![allow(stable_features)]
-
 use enum_ordinalize::Ordinalize;
 
 #[test]

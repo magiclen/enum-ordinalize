@@ -1,5 +1,5 @@
 use proc_macro2::{Literal, TokenStream};
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::{ToTokens, TokenStreamExt, quote};
 use syn::Expr;
 
 use crate::int128::Int128;
