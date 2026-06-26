@@ -18,7 +18,7 @@
 ///
 ///     #[inline]
 ///     unsafe fn from_ordinal_unsafe(number: Self::VariantType) -> Self {
-///         ::core::mem::transmute(number)
+///         unsafe { ::core::mem::transmute(number) }
 ///     }
 ///
 ///     #[inline]
@@ -55,7 +55,7 @@ pub trait Ordinalize: Sized + 'static {
     /// Obtain a variant based on an integer number.
     ///
     /// # Safety
-    /// You have to ensure that the input integer number can correspond to a variant on your own.
+    /// You have to ensure that the input integer number corresponds to a declared variant of the enum.
     unsafe fn from_ordinal_unsafe(number: Self::VariantType) -> Self;
 
     /// Obtain a variant based on an integer number.

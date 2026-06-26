@@ -1,0 +1,12 @@
+error: available sub-attributes for the `ordinalize` attribute:
+           impl_trait
+           variant_count
+           variants
+           values
+           ordinal
+           from_ordinal_unsafe
+           from_ordinal
+ --> tests/ui/fail/bad_attribute.rs:4:14
+  |
+4 | #[ordinalize(unknown)]
+  |              ^^^^^^^

@@ -5,6 +5,12 @@ Enum Ordinalize
 
 This library enables enums to not only obtain the ordinal values of their variants but also allows for the construction of enums from an ordinal value.
 
+## Feature Flags
+
+The default features are `derive` and `traits`. The `derive` feature re-exports the `Ordinalize` derive macro, and the `traits` feature exposes the `Ordinalize` trait and enables the derive macro to implement it automatically.
+
+When only `derive` is enabled, the macro can still generate inherent constants and functions with the `#[ordinalize(...)]` attributes shown below, but it will not implement the `Ordinalize` trait.
+
 ## Usage
 
 Use `#[derive(Ordinalize)]` to have an enum (which must only has unit variants) implement the `Ordinalize` trait.
@@ -102,6 +108,8 @@ assert_eq!(MyEnum::Zero, unsafe { MyEnum::from_ordinal_unsafe(0usize) });
 assert_eq!(MyEnum::One, unsafe { MyEnum::from_ordinal_unsafe(1usize) });
 assert_eq!(MyEnum::Two, unsafe { MyEnum::from_ordinal_unsafe(2usize) });
 ```
+
+Path constants, casts, binary expressions, and const fn calls used as discriminants require an explicit integer `#[repr(...)]` because the derive macro cannot evaluate them while choosing the ordinal type.
 
 #### Useful Increment
 

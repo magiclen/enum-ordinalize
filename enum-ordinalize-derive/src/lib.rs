@@ -165,18 +165,22 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                 if let Some(ident) = path.get_ident() {
                     match ident.to_string().as_str() {
                         "repr" => {
-                            // #[repr(u8)], #[repr(u16)], ..., etc.
                             if let Meta::List(list) = &attr.meta {
                                 let result = list.parse_args_with(
-                                    Punctuated::<Ident, Token![,]>::parse_terminated,
+                                    Punctuated::<Meta, Token![,]>::parse_terminated,
                                 )?;
 
-                                if let Some(value) = result.into_iter().next() {
-                                    variant_type = VariantType::from_str(value.to_string());
+                                for meta in result {
+                                    if let Some(ident) = meta.path().get_ident() {
+                                        let repr_type = VariantType::from_str(ident.to_string());
+
+                                        if !matches!(repr_type, VariantType::NonDetermined) {
+                                            variant_type = repr_type;
+                                            break;
+                                        }
+                                    }
                                 }
                             }
-
-                            break;
                         },
                         "ordinalize" => {
                             if let Meta::List(list) = &attr.meta {
@@ -588,7 +592,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                 quote! {
                     #[inline]
                     unsafe fn from_ordinal_unsafe(number: #variant_type) -> Self {
-                        ::core::mem::transmute(number)
+                        unsafe { ::core::mem::transmute(number) }
                     }
                 }
             };
@@ -621,7 +625,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
             };
 
             expanded.extend(quote! {
-                impl #impl_generics Ordinalize for #name #ty_generics #where_clause {
+                impl #impl_generics ::enum_ordinalize::Ordinalize for #name #ty_generics #where_clause {
                     type VariantType = #variant_type;
 
                     const VARIANT_COUNT: usize = #variant_count;
@@ -734,7 +738,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
             quote! {
                 #(#[#meta])*
                 #vis const unsafe fn #ident (number: #variant_type) -> Self {
-                    ::core::mem::transmute(number)
+                    unsafe { ::core::mem::transmute(number) }
                 }
             }
         };
