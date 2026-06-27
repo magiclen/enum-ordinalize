@@ -4,6 +4,7 @@ use enum_ordinalize::Ordinalize;
 
 #[test]
 fn ordinal_1() {
+    #[allow(dead_code)]
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[ordinalize(ordinal(pub const fn v, doc = "Retrieve the integer number of this variant."))]
     enum MyEnum {
@@ -12,13 +13,12 @@ fn ordinal_1() {
         C,
     }
 
-    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
-
     assert_eq!(1, MyEnum::B.v());
 }
 
 #[test]
 fn ordinal_2() {
+    #[allow(dead_code)]
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[ordinalize(ordinal(pub fn v, doc = "Retrieve the integer number of this variant."))]
     enum MyEnum {
@@ -26,8 +26,6 @@ fn ordinal_2() {
         B,
         C,
     }
-
-    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
 
     assert_eq!(1, MyEnum::B.v());
 }

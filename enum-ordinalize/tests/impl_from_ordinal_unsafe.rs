@@ -4,6 +4,7 @@ use enum_ordinalize::Ordinalize;
 
 #[test]
 fn from_ordinal_unsafe_1() {
+    #[allow(dead_code)]
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[ordinalize(from_ordinal_unsafe(
         pub const fn v,
@@ -17,13 +18,12 @@ fn from_ordinal_unsafe_1() {
         C,
     }
 
-    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
-
     assert_eq!(MyEnum::B, unsafe { MyEnum::v(1) });
 }
 
 #[test]
 fn from_ordinal_unsafe_2() {
+    #[allow(dead_code)]
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[ordinalize(from_ordinal_unsafe(
         pub fn v,
@@ -36,8 +36,6 @@ fn from_ordinal_unsafe_2() {
         B,
         C,
     }
-
-    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
 
     assert_eq!(MyEnum::B, unsafe { MyEnum::v(1) });
 }

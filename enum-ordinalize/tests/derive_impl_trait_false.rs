@@ -44,3 +44,18 @@ fn create_ordinalized_enum_1_3() {
         }
     }
 }
+
+#[test]
+fn create_ordinalized_enum_1_4() {
+    #[allow(dead_code)]
+    #[derive(Debug, PartialEq, Eq, Ordinalize)]
+    #[repr(u8)]
+    #[ordinalize(impl_trait = false)]
+    #[ordinalize(variant_count(pub const VARIANT_COUNT))]
+    enum MyEnum {
+        A,
+        B,
+    }
+
+    assert_eq!(2, MyEnum::VARIANT_COUNT);
+}

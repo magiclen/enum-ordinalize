@@ -1,5 +1,0 @@
-error: an ordinalized enum can only have unit variants
- --> tests/ui/fail/non_unit_variant.rs:5:5
-  |
-5 |     A(u8),
-  |     ^

@@ -23,7 +23,6 @@ use syn::{
     parse::{Parse, ParseStream},
     parse_macro_input,
     punctuated::Punctuated,
-    spanned::Spanned,
 };
 use variant_type::VariantType;
 
@@ -194,8 +193,8 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                     if let Some(ident) = path.get_ident() {
                                         match ident.to_string().as_str() {
                                             "impl_trait" => {
-                                                if let Meta::NameValue(meta) = &meta {
-                                                    if let Expr::Lit(lit) = &meta.value {
+                                                if let Meta::NameValue(name_value) = &meta {
+                                                    if let Expr::Lit(lit) = &name_value.value {
                                                         if let Lit::Bool(value) = &lit.lit {
                                                             if cfg!(feature = "traits") {
                                                                 enable_trait = value.value;
@@ -203,21 +202,19 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                         } else {
                                                             return Err(
                                                                 panic::bool_attribute_usage(
-                                                                    ident,
-                                                                    ident.span(),
+                                                                    ident, lit,
                                                                 ),
                                                             );
                                                         }
                                                     } else {
                                                         return Err(panic::bool_attribute_usage(
                                                             ident,
-                                                            ident.span(),
+                                                            &name_value.value,
                                                         ));
                                                     }
                                                 } else {
                                                     return Err(panic::bool_attribute_usage(
-                                                        ident,
-                                                        ident.span(),
+                                                        ident, &meta,
                                                     ));
                                                 }
                                             },
@@ -226,8 +223,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                     enable_variant_count = Some(list.parse_args()?);
                                                 } else {
                                                     return Err(panic::list_attribute_usage(
-                                                        ident,
-                                                        ident.span(),
+                                                        ident, &meta,
                                                     ));
                                                 }
                                             },
@@ -236,8 +232,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                     enable_variants = Some(list.parse_args()?);
                                                 } else {
                                                     return Err(panic::list_attribute_usage(
-                                                        ident,
-                                                        ident.span(),
+                                                        ident, &meta,
                                                     ));
                                                 }
                                             },
@@ -246,8 +241,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                     enable_values = Some(list.parse_args()?);
                                                 } else {
                                                     return Err(panic::list_attribute_usage(
-                                                        ident,
-                                                        ident.span(),
+                                                        ident, &meta,
                                                     ));
                                                 }
                                             },
@@ -257,8 +251,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                         Some(list.parse_args()?);
                                                 } else {
                                                     return Err(panic::list_attribute_usage(
-                                                        ident,
-                                                        ident.span(),
+                                                        ident, &meta,
                                                     ));
                                                 }
                                             },
@@ -267,8 +260,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                     enable_from_ordinal = Some(list.parse_args()?);
                                                 } else {
                                                     return Err(panic::list_attribute_usage(
-                                                        ident,
-                                                        ident.span(),
+                                                        ident, &meta,
                                                     ));
                                                 }
                                             },
@@ -277,26 +269,22 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                     enable_ordinal = Some(list.parse_args()?);
                                                 } else {
                                                     return Err(panic::list_attribute_usage(
-                                                        ident,
-                                                        ident.span(),
+                                                        ident, &meta,
                                                     ));
                                                 }
                                             },
                                             _ => {
                                                 return Err(panic::sub_attributes_for_ordinalize(
-                                                    ident.span(),
+                                                    &meta,
                                                 ));
                                             },
                                         }
                                     } else {
-                                        return Err(panic::list_attribute_usage(
-                                            ident,
-                                            ident.span(),
-                                        ));
+                                        return Err(panic::sub_attributes_for_ordinalize(&meta));
                                     }
                                 }
                             } else {
-                                return Err(panic::list_attribute_usage(ident, ident.span()));
+                                return Err(panic::list_attribute_usage(ident, attr));
                             }
                         },
                         _ => (),
@@ -310,7 +298,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                 let variant_count = data.variants.len();
 
                 if variant_count == 0 {
-                    return Err(panic::no_variant(name.span()));
+                    return Err(panic::no_variant(name));
                 }
 
                 let mut values: Vec<IntWrapper> = Vec::with_capacity(variant_count);
@@ -330,12 +318,10 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                     Expr::Lit(lit) => {
                                         if let Lit::Int(lit) = &lit.lit {
                                             counter = lit.base10_parse().map_err(|error| {
-                                                syn::Error::new(lit.span(), error)
+                                                syn::Error::new_spanned(lit, error)
                                             })?;
                                         } else {
-                                            return Err(panic::unsupported_discriminant(
-                                                lit.span(),
-                                            ));
+                                            return Err(panic::unsupported_discriminant(lit));
                                         }
                                     },
                                     Expr::Unary(unary) => {
@@ -352,26 +338,24 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                             if lit.base10_digits() == "170141183460469231731687303715884105728" {
                                                                 counter = i128::MIN;
                                                             } else {
-                                                                return Err(syn::Error::new(lit.span(), error));
+                                                                return Err(syn::Error::new_spanned(lit, error));
                                                             }
                                                         },
                                                     }
                                                 } else {
-                                                    return Err(panic::unsupported_discriminant(lit.span()));
+                                                    return Err(panic::unsupported_discriminant(lit));
                                                 }
                                             },
                                             Expr::Path(_)
                                             | Expr::Cast(_)
                                             | Expr::Binary(_)
                                             | Expr::Call(_) => {
-                                                return Err(panic::constant_variable_on_non_determined_size_enum(unary.expr.span()))
+                                                return Err(panic::constant_variable_on_non_determined_size_enum(unary))
                                             },
-                                            _ => return Err(panic::unsupported_discriminant(unary.expr.span())),
+                                            _ => return Err(panic::unsupported_discriminant(unary)),
                                         }
                                         } else {
-                                            return Err(panic::unsupported_discriminant(
-                                                unary.op.span(),
-                                            ));
+                                            return Err(panic::unsupported_discriminant(unary));
                                         }
                                     },
                                     Expr::Path(_)
@@ -380,11 +364,11 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                     | Expr::Call(_) => {
                                         return Err(
                                             panic::constant_variable_on_non_determined_size_enum(
-                                                exp.span(),
+                                                exp,
                                             ),
                                         );
                                     },
-                                    _ => return Err(panic::unsupported_discriminant(exp.span())),
+                                    _ => return Err(panic::unsupported_discriminant(exp)),
                                 }
                             };
 
@@ -402,7 +386,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
 
                             counter = counter.saturating_add(1);
                         } else {
-                            return Err(panic::not_unit_variant(variant.span()));
+                            return Err(panic::not_unit_variant(variant));
                         }
                     }
 
@@ -429,7 +413,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                     Expr::Lit(lit) => {
                                         if let Lit::Int(lit) = &lit.lit {
                                             counter = lit.base10_parse().map_err(|error| {
-                                                syn::Error::new(lit.span(), error)
+                                                syn::Error::new_spanned(lit, error)
                                             })?;
 
                                             values.push(IntWrapper::from(counter));
@@ -438,9 +422,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
 
                                             last_exp = None;
                                         } else {
-                                            return Err(panic::unsupported_discriminant(
-                                                lit.span(),
-                                            ));
+                                            return Err(panic::unsupported_discriminant(lit));
                                         }
                                     },
                                     Expr::Unary(unary) => {
@@ -450,7 +432,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                     if let Lit::Int(lit) = &lit.lit {
                                                         counter = -lit.base10_parse().map_err(
                                                             |error| {
-                                                                syn::Error::new(lit.span(), error)
+                                                                syn::Error::new_spanned(lit, error)
                                                             },
                                                         )?;
 
@@ -461,9 +443,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                         last_exp = None;
                                                     } else {
                                                         return Err(
-                                                            panic::unsupported_discriminant(
-                                                                lit.span(),
-                                                            ),
+                                                            panic::unsupported_discriminant(lit),
                                                         );
                                                     }
                                                 },
@@ -483,14 +463,12 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                                                 },
                                                 _ => {
                                                     return Err(panic::unsupported_discriminant(
-                                                        exp.span(),
+                                                        exp,
                                                     ));
                                                 },
                                             }
                                         } else {
-                                            return Err(panic::unsupported_discriminant(
-                                                unary.op.span(),
-                                            ));
+                                            return Err(panic::unsupported_discriminant(unary));
                                         }
                                     },
                                     Expr::Path(_) => {
@@ -507,7 +485,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
 
                                         use_constant_counter = true;
                                     },
-                                    _ => return Err(panic::unsupported_discriminant(exp.span())),
+                                    _ => return Err(panic::unsupported_discriminant(exp)),
                                 }
                             } else if let Some(exp) = last_exp {
                                 values.push(IntWrapper::from((exp, constant_counter)));
@@ -523,7 +501,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
 
                             variant_idents.push(variant.ident.clone());
                         } else {
-                            return Err(panic::not_unit_variant(variant.span()));
+                            return Err(panic::not_unit_variant(variant));
                         }
                     }
                 }
@@ -543,7 +521,7 @@ pub fn ordinalize_derive(input: TokenStream) -> TokenStream {
                     enable_ordinal,
                 })
             } else {
-                Err(panic::not_enum(ast.ident.span()))
+                Err(panic::not_enum(&ast.ident))
             }
         }
     }

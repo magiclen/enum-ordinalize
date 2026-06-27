@@ -14,9 +14,6 @@ include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 [dependencies]
 enum-ordinalize-derive = { version = "4.4", path = "../enum-ordinalize-derive", default-features = false, optional = true }
 
-[dev-dependencies]
-trybuild = "1"
-
 [features]
 default = ["derive", "traits"]
 

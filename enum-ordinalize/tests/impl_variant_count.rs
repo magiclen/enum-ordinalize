@@ -4,6 +4,7 @@ use enum_ordinalize::Ordinalize;
 
 #[test]
 fn variant_count_const_fn_1() {
+    #[allow(dead_code)]
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[ordinalize(variant_count(pub const fn v, doc = "Retrieve the count of variants."))]
     enum MyEnum {
@@ -12,13 +13,12 @@ fn variant_count_const_fn_1() {
         C,
     }
 
-    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
-
     assert_eq!(3, MyEnum::v());
 }
 
 #[test]
 fn variant_count_const_fn_2() {
+    #[allow(dead_code)]
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[ordinalize(variant_count(pub fn v, doc = "Retrieve the count of variants."))]
     enum MyEnum {
@@ -27,13 +27,12 @@ fn variant_count_const_fn_2() {
         C,
     }
 
-    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
-
     assert_eq!(3, MyEnum::v());
 }
 
 #[test]
 fn variant_count_const_1() {
+    #[allow(dead_code)]
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[ordinalize(variant_count(pub const V, doc = "The count of variants."))]
     enum MyEnum {
@@ -42,13 +41,12 @@ fn variant_count_const_1() {
         C,
     }
 
-    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
-
     assert_eq!(3, MyEnum::V);
 }
 
 #[test]
 fn variant_count_const_2() {
+    #[allow(dead_code)]
     #[derive(Debug, PartialEq, Eq, Ordinalize)]
     #[ordinalize(variant_count(pub V, doc = "The count of variants."))]
     enum MyEnum {
@@ -56,8 +54,6 @@ fn variant_count_const_2() {
         B,
         C,
     }
-
-    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
 
     assert_eq!(3, MyEnum::V);
 }

@@ -1,5 +1,0 @@
-error: the discriminant of a variant can be assigned not to a literal integer only when the ordinalized enum is using the `repr` attribute to determine it's size before compilation
- --> tests/ui/fail/constant_without_repr.rs:7:9
-  |
-7 |     A = VALUE,
-  |         ^^^^^
