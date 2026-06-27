@@ -12,6 +12,8 @@ fn variants_const_fn_1() {
         C,
     }
 
+    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
+
     assert_eq!([0i8, 1i8, 2i8], MyEnum::v());
 }
 
@@ -24,6 +26,8 @@ fn variants_const_fn_2() {
         B,
         C,
     }
+
+    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
 
     assert_eq!([0i8, 1i8, 2i8], MyEnum::v());
 }
@@ -38,6 +42,8 @@ fn variants_const_1() {
         C,
     }
 
+    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
+
     assert_eq!([0i8, 1i8, 2i8], MyEnum::V);
 }
 
@@ -50,6 +56,8 @@ fn variants_const_2() {
         B,
         C,
     }
+
+    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
 
     assert_eq!([0i8, 1i8, 2i8], MyEnum::V);
 }

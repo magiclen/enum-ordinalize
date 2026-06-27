@@ -17,6 +17,8 @@ fn from_ordinal_unsafe_1() {
         C,
     }
 
+    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
+
     assert_eq!(MyEnum::B, unsafe { MyEnum::v(1) });
 }
 
@@ -34,6 +36,8 @@ fn from_ordinal_unsafe_2() {
         B,
         C,
     }
+
+    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
 
     assert_eq!(MyEnum::B, unsafe { MyEnum::v(1) });
 }

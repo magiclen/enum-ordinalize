@@ -12,6 +12,8 @@ fn ordinal_1() {
         C,
     }
 
+    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
+
     assert_eq!(1, MyEnum::B.v());
 }
 
@@ -24,6 +26,8 @@ fn ordinal_2() {
         B,
         C,
     }
+
+    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
 
     assert_eq!(1, MyEnum::B.v());
 }

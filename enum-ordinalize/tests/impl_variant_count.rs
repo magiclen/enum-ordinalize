@@ -12,6 +12,8 @@ fn variant_count_const_fn_1() {
         C,
     }
 
+    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
+
     assert_eq!(3, MyEnum::v());
 }
 
@@ -24,6 +26,8 @@ fn variant_count_const_fn_2() {
         B,
         C,
     }
+
+    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
 
     assert_eq!(3, MyEnum::v());
 }
@@ -38,6 +42,8 @@ fn variant_count_const_1() {
         C,
     }
 
+    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
+
     assert_eq!(3, MyEnum::V);
 }
 
@@ -50,6 +56,8 @@ fn variant_count_const_2() {
         B,
         C,
     }
+
+    let _ = [MyEnum::A, MyEnum::B, MyEnum::C];
 
     assert_eq!(3, MyEnum::V);
 }
