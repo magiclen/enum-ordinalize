@@ -1,6 +1,6 @@
 [package]
 name = "enum-ordinalize"
-version = "4.4.0"
+version = "4.4.1"
 edition = "2024"
 rust-version = "1.89"
 repository = "https://github.com/magiclen/enum-ordinalize"
@@ -12,7 +12,7 @@ license = "MIT"
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
 [dependencies]
-enum-ordinalize-derive = { version = "4.4", path = "../enum-ordinalize-derive", default-features = false, optional = true }
+enum-ordinalize-derive = { version = "4.4.1", path = "../enum-ordinalize-derive", default-features = false, optional = true }
 
 [features]
 default = ["derive", "traits"]
