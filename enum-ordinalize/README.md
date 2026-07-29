@@ -42,6 +42,51 @@ assert_eq!(MyEnum::One, unsafe { MyEnum::from_ordinal_unsafe(1i8) });
 assert_eq!(MyEnum::Two, unsafe { MyEnum::from_ordinal_unsafe(2i8) });
 ```
 
+#### Quickly Implement `Serialize` and `Deserialize`
+
+The `Ordinalize` trait can be used to serialize an enum as its ordinal value and safely reject unknown values during deserialization. Add `serde` to your dependencies:
+
+```toml
+serde = { version = "1", default-features = false }
+```
+
+Then implement the traits using `ordinal` and `from_ordinal`:
+
+```rust
+use enum_ordinalize::Ordinalize;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+#[derive(Debug, PartialEq, Eq, Ordinalize)]
+#[repr(i8)]
+enum MyEnum {
+    Zero,
+    One,
+    Two,
+}
+
+impl Serialize for MyEnum {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_i8(self.ordinal())
+    }
+}
+
+impl<'de> Deserialize<'de> for MyEnum {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let ordinal = i8::deserialize(deserializer)?;
+
+        Self::from_ordinal(ordinal).ok_or_else(|| {
+            <D::Error as serde::de::Error>::custom("invalid ordinal for MyEnum")
+        })
+    }
+}
+```
+
 #### The (Ordinal) Size of an Enum
 
 The ordinal value is an integer whose size is determined by the enum itself. The size of the enum increases with the magnitude of the variants' values, whether larger (or smaller if negative).
