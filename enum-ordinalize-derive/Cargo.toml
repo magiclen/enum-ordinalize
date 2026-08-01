@@ -1,6 +1,6 @@
 [package]
 name = "enum-ordinalize-derive"
-version = "4.4.1"
+version = "4.4.2"
 edition = "2024"
 rust-version = "1.89"
 repository = "https://github.com/magiclen/enum-ordinalize"
@@ -15,9 +15,9 @@ include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 proc-macro = true
 
 [dependencies]
-syn = "2"
-quote = "1.0.25"
-proc-macro2 = "1.0.52"
+syn = "3"
+quote = "1.0.35"
+proc-macro2 = "1.0.91"
 
 [features]
 default = []
